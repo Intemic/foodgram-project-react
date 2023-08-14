@@ -8,7 +8,6 @@ class TagInline(admin.TabularInline):
 class IngredientInline(admin.TabularInline):
     model = Recipe.ingredient.through
 
-
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     inlines = [
