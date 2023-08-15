@@ -1,11 +1,9 @@
-from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
 
 from core.constants import FIELD_LENGTH
-
-User = get_user_model()
+from users.models import User
 
 
 class Name(models.Model):
@@ -121,7 +119,7 @@ class RecipeTag(models.Model):
             UniqueConstraint(fields=['recipe', 'tag'], name='unique tag')
         ]
         verbose_name = 'Рецепт, Тэг'
-
+        verbose_name_plural = 'Рецепт, Тэги'
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
@@ -155,6 +153,7 @@ class RecipeIngredient(models.Model):
             )
         ]
         verbose_name = 'Рецепт, Ингредиент'
+        verbose_name_plural = 'Рецепт, Ингредиенты'
 
 
 class Follow(models.Model):

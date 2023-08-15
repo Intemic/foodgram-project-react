@@ -46,13 +46,24 @@ class RecipeAdmin(admin.ModelAdmin):
         TagInline,
         IngredientInline,
     ]
-    fk_name = 'ingredient'
+    fields = (
+        (
+            'name',
+            'cooking_time',
+        ),
+        (
+            'author',
+        ),
+        ('text',),
+        ('image',),
+    )
     list_display = (
         'id',
         'name',
         'author',
         'get_ingredient',
-        'get_tag'
+        'get_tag',
+        'get_count',
     )
     list_filter = ('author', 'name', 'tag',)
     empty_value_display = '-пусто-'
@@ -64,3 +75,8 @@ class RecipeAdmin(admin.ModelAdmin):
     @admin.display(description='Тэги')
     def get_tag(self, obj):
         return [tag for tag in obj.tag.all()]
+
+    @admin.display(description='Кол-во в избр.')
+    def get_count(self, obj):
+        return obj.favorites.count()
+   
