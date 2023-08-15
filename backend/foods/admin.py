@@ -1,6 +1,7 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
-from .models import Ingredient, Recipe, Favorite, Follow, Tag
+from .models import Favorite, Follow, Ingredient, Recipe, Tag
 
 
 class TagInline(admin.TabularInline):
@@ -55,16 +56,21 @@ class RecipeAdmin(admin.ModelAdmin):
             'author',
         ),
         ('text',),
-        ('image',),
+        (
+            'image',
+            'get_html_photo'
+        ),
     )
     list_display = (
         'id',
         'name',
         'author',
+        'get_html_photo',
         'get_ingredient',
         'get_tag',
         'get_count',
     )
+    readonly_fields = ('get_html_photo',)
     list_filter = ('author', 'name', 'tag',)
     empty_value_display = '-пусто-'
 
@@ -79,4 +85,8 @@ class RecipeAdmin(admin.ModelAdmin):
     @admin.display(description='Кол-во в избр.')
     def get_count(self, obj):
         return obj.favorites.count()
-   
+
+    @admin.display(description='Миниатюра')
+    def get_html_photo(self, obj):
+        if obj.image:
+            return mark_safe(f'<img src="{ obj.image.url }" width=100>')

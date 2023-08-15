@@ -121,6 +121,7 @@ class RecipeTag(models.Model):
         verbose_name = 'Рецепт, Тэг'
         verbose_name_plural = 'Рецепт, Тэги'
 
+
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
