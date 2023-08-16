@@ -60,23 +60,19 @@ class RecipeAdmin(admin.ModelAdmin):
             'image',
             'get_html_photo'
         ),
+        ('get_count',),
     )
     list_display = (
         'id',
         'name',
         'author',
         'get_html_photo',
-        'get_ingredient',
         'get_tag',
         'get_count',
     )
-    readonly_fields = ('get_html_photo',)
+    readonly_fields = ('get_html_photo', 'get_count',)
     list_filter = ('author', 'name', 'tag',)
     empty_value_display = '-пусто-'
-
-    @admin.display(description='Ингридиенты')
-    def get_ingredient(self, obj):
-        return [ingredient for ingredient in obj.ingredient.all()]
 
     @admin.display(description='Тэги')
     def get_tag(self, obj):
