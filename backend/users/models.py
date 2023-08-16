@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import validate_email
 from django.db import models
 
 from core.constants import FIELD_LENGTH
@@ -15,25 +16,27 @@ class User(AbstractUser):
     )
     password = models.CharField(
         verbose_name='Пароль',
-        max_length=FIELD_LENGTH['PASSWORD']         
+        max_length=FIELD_LENGTH['PASSWORD']
     )
     email = models.CharField(
-        verbose_name='Имя пользователя',
-        max_length=FIELD_LENGTH['EMAIL'],   
-        unique=True 
+        verbose_name='Email',
+        max_length=FIELD_LENGTH['EMAIL'],
+        unique=True,
+        validators=[validate_email]
     )
     first_name = models.CharField(
         verbose_name='Имя',
-        max_length=FIELD_LENGTH['FIRST_NAME']        
+        max_length=FIELD_LENGTH['FIRST_NAME']
     )
     last_name = models.CharField(
         verbose_name='Фамилия',
-        max_length=FIELD_LENGTH['LAST_NAME']        
+        max_length=FIELD_LENGTH['LAST_NAME']
     )
 
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+        ordering = ('username',)
 
     def __str__(self) -> str:
-        return self.get_full_name()[:50]        
+        return self.get_full_name()[:50]
