@@ -1,4 +1,39 @@
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-User = get_user_model()
+from core.constants import FIELD_LENGTH
+from core.validators import username_validator
+
+
+class User(AbstractUser):
+    username = models.CharField(
+        verbose_name='Имя пользователя',
+        max_length=FIELD_LENGTH['USER_NAME'],
+        unique=True,
+        db_index=True,
+        validators=[username_validator]
+    )
+    password = models.CharField(
+        verbose_name='Пароль',
+        max_length=FIELD_LENGTH['PASSWORD']         
+    )
+    email = models.CharField(
+        verbose_name='Имя пользователя',
+        max_length=FIELD_LENGTH['EMAIL'],   
+        unique=True 
+    )
+    first_name = models.CharField(
+        verbose_name='Имя',
+        max_length=FIELD_LENGTH['FIRST_NAME']        
+    )
+    last_name = models.CharField(
+        verbose_name='Фамилия',
+        max_length=FIELD_LENGTH['LAST_NAME']        
+    )
+
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+
+    def __str__(self) -> str:
+        return self.get_full_name()[:50]        
