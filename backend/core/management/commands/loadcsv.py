@@ -134,7 +134,8 @@ class Command(BaseCommand):
                     try:
                         func(file_reader, model)
                         print('\033[32m OK \033[0;0m')
-                    except Exception:
+                    except Exception as err:
+                        print(err)
                         print('\033[31m NO \033[0;0m')
             else:
                 print(f'{file} - \033[31m NO \033[0;0m')

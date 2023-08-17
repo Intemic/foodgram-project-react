@@ -4,12 +4,12 @@ from django.utils.safestring import mark_safe
 from .models import Favorite, Follow, Ingredient, Recipe, Tag
 
 
-class TagInline(admin.TabularInline):
-    model = Recipe.tag.through
+class TagsInline(admin.TabularInline):
+    model = Recipe.tags.through
 
 
-class IngredientInline(admin.TabularInline):
-    model = Recipe.ingredient.through
+class IngredientsInline(admin.TabularInline):
+    model = Recipe.ingredients.through
 
 
 @admin.register(Tag)
@@ -44,8 +44,8 @@ class Follow(admin.ModelAdmin):
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
     inlines = [
-        TagInline,
-        IngredientInline,
+        TagsInline,
+        IngredientsInline,
     ]
     fields = (
         (
@@ -71,12 +71,12 @@ class RecipeAdmin(admin.ModelAdmin):
         'get_count',
     )
     readonly_fields = ('get_html_photo', 'get_count',)
-    list_filter = ('author', 'name', 'tag',)
+    list_filter = ('author', 'name', 'tags',)
     empty_value_display = '-пусто-'
 
     @admin.display(description='Тэги')
     def get_tag(self, obj):
-        return [tag for tag in obj.tag.all()]
+        return [tag for tag in obj.tags.all()]
 
     @admin.display(description='Кол-во в избр.')
     def get_count(self, obj):

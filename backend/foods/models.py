@@ -32,6 +32,7 @@ class Ingredient(Name):
     class Meta(Name.Meta):
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        ordering = ['name']
 
 
 class Tag(Name):
@@ -81,13 +82,13 @@ class Recipe(Name):
             )
         ],
     )
-    ingredient = models.ManyToManyField(
+    ingredients = models.ManyToManyField(
         Ingredient,
         verbose_name='Ингредиент',
         help_text='Ингредиент',
         through='RecipeIngredient'
     )
-    tag = models.ManyToManyField(
+    tags = models.ManyToManyField(
         Tag,
         verbose_name='Тег',
         help_text='Тег',
@@ -105,13 +106,13 @@ class RecipeTag(models.Model):
         Recipe,
         verbose_name='Рецепт',
         on_delete=models.CASCADE,
-        related_name='tags'
+        related_name='rec_tags'
     )
     tag = models.ForeignKey(
         Tag,
         verbose_name='Тэг',
         on_delete=models.CASCADE,
-        related_name='recipes'
+        related_name='rec_tags'
     )
 
     class Meta:
@@ -127,13 +128,13 @@ class RecipeIngredient(models.Model):
         Recipe,
         verbose_name='Рецепт',
         on_delete=models.CASCADE,
-        related_name='ingredients'
+        related_name='rec_ingrs'
     )
     ingredient = models.ForeignKey(
         Ingredient,
         verbose_name='Ингредиент',
         on_delete=models.CASCADE,
-        related_name='recipes'
+        related_name='rec_ingrs'
     )
     amount = models.PositiveIntegerField(
         verbose_name='Количество',
