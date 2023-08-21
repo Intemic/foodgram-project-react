@@ -1,3 +1,6 @@
+import base64
+
+from django.core.files.base import ContentFile
 from rest_framework import serializers
 
 from .models import Ingredient, Recipe, RecipeIngredient, Tag
@@ -26,6 +29,11 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField(
+        source='ingredient.id'
+    )
+
+    
     class Meta:
         model = RecipeIngredient
         fields = ('id', 'amount')
@@ -74,23 +82,34 @@ class RecipeSerializer(serializers.ModelSerializer):
         )
 
     def get_is_favorited(self, obj):
-        user = self.context['request'].user
+        user = serializers.CurrentUserDefault() #self.context['request'].user
         if user.is_authenticated:
             return user.favorites.filter(recipe=obj.id).exists()
         return False
 
     def get_is_in_shopping_cart(self, obj):
-        user = self.context['request'].user
+        user = serializers.CurrentUserDefault() #self.context['request'].user
         if user.is_authenticated:
             return user.shoplists.filter(recipe=obj.id).exists()
         return False
-    
+
+
+class Base64ImageField(serializers.ImageField):
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith('data:image'):
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
+            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+
+        return super().to_internal_value(data)
+
 
 class RecipeCreateSerializer(serializers.ModelSerializer):
     ingredients = RecipeIngredientCreateSerializer(
-        source='rec_ingrs',
+        # source='rec_ingrs',
         many=True
     )
+    image = Base64ImageField()
     name = serializers.CharField(
         max_length=FIELD_LENGTH['NAME']
     )
@@ -100,21 +119,33 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         fields = (
             'ingredients',
             'tags',
-            # 'image',
+            'image',
             'name',
             'text',
             'cooking_time',
         )
-        
-
 
     def validate_cooking_time(self, value):
         if value < 1:
-            raise serializers.ValidationError('Введите значение больше или равно 1 мин!')
+            raise serializers.ValidationError(
+                'Введите значение больше или равно 1 мин!'
+            )
         return value
-    
-    def create(self, validated_data):
-        ingredients = validated_data.pop('ingredients', '')
 
+    def create(self, validated_data):
+        ingredients = validated_data.pop('ingredients')
+     
         recipe = Recipe.objects.create(**validated_data)
+        ing_list = []
+        for ingredient in ingredients:
+            recipe_ing = RecipeIngredient.objects.create(recipe=recipe, ingredient=ingredient.get['id'], amount=ingredient.get['amount'])
+            ing_list.add(recipe_ing)
+        # recipe.ob 
+        recipe.ingredients.set(ing_list)
         return recipe
+
+    def update(self, instance, validated_data):
+        return super().update(instance, validated_data)
+
+    # def to_representation(self, instance):
+    #     return RecipeSerializer(instance).data

@@ -1,11 +1,14 @@
-from rest_framework import filters, permissions
+from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, permissions
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from .models import Ingredient, Recipe, Tag
 from .filters import RecipeFilter
 from .pagination import PageLimitPagination
 from .serializers import IngredientSerializer, RecipeSerializer, RecipeCreateSerializer, TagSerializer
+
+User = get_user_model()
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -24,7 +27,7 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
-    permission_classes = (permissions.AllowAny,)
+#    permission_classes = (permissions.AllowAny,)
     serializer_class = RecipeSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
     filter_backends = (DjangoFilterBackend,)
@@ -37,7 +40,13 @@ class RecipeViewSet(ModelViewSet):
     )
     pagination_class = PageLimitPagination
 
-    def get_serializer_class(self, *args, **kwargs):
+    def get_serializer_class(self):
         if self.request.method in ('POST', 'PATCH'):
             return RecipeCreateSerializer
         return super().get_serializer_class()
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(author=self.request.user)
