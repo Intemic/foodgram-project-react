@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from .models import Favorite, Follow, Ingredient, Recipe, Tag
+from .models import Favorite, Follow, Ingredient, Recipe, ShopList, Tag
 
 
 class TagsInline(admin.TabularInline):
@@ -86,3 +86,10 @@ class RecipeAdmin(admin.ModelAdmin):
     def get_html_photo(self, obj):
         if obj.image:
             return mark_safe(f'<img src="{ obj.image.url }" width=100>')
+
+
+@admin.register(ShopList)
+class ShopList(admin.ModelAdmin):
+    list_display = ('id', 'user', 'recipe', )
+    list_filter = ('user', )
+    empty_value_display = '-пусто-'

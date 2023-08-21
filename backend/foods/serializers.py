@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Ingredient, Recipe, RecipeIngredient, Tag 
+from .models import Ingredient, Recipe, RecipeIngredient, Tag
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -24,14 +24,14 @@ class IngredientSerializer(serializers.ModelSerializer):
         )
 
 
-class RecipeIngredient(serializers.ModelSerializer):
-    amount = serializers.SlugRelatedField(
-         slug_field='rec_ingrs__amount',
-         read_only=True
-     )
+class RecipeIngredientSerializer(serializers.ModelSerializer):
+    name = serializers.ReadOnlyField(source='ingredient.name')
+    measurement_unit = serializers.ReadOnlyField(
+        source='ingredient.measurement_unit'
+    )
 
     class Meta:
-        model = Ingredient
+        model = RecipeIngredient
         fields = (
             'id',
             'name',
@@ -44,10 +44,13 @@ class RecipeSerializer(serializers.ModelSerializer):
     tags = TagSerializer(
         many=True,
     )
-    ingredients = RecipeIngredient(
+    ingredients = RecipeIngredientSerializer(
+        source='rec_ingrs',
         many=True
     )
-    
+    is_favorited = serializers.SerializerMethodField()
+    is_in_shopping_cart = serializers.SerializerMethodField()
+
     class Meta:
         model = Recipe
         fields = (
@@ -55,10 +58,22 @@ class RecipeSerializer(serializers.ModelSerializer):
             'tags',
             'author',
             'ingredients',
-            # 'is_favorited',
-            # 'is_in_shopping_cart',
+            'is_favorited',
+            'is_in_shopping_cart',
             'name',
             'image',
             'text',
             'cooking_time',
         )
+
+    def get_is_favorited(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return user.favorites.filter(recipe=obj.id).exists()
+        return False
+
+    def get_is_in_shopping_cart(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return user.shoplists.filter(recipe=obj.id).exists()
+        return False

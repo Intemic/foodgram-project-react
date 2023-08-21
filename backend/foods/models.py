@@ -102,6 +102,7 @@ class Recipe(Name):
 
 
 class RecipeTag(models.Model):
+    """Связка рецепт - тэг."""
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='Рецепт',
@@ -124,6 +125,7 @@ class RecipeTag(models.Model):
 
 
 class RecipeIngredient(models.Model):
+    """Связка рецепт - ингредиент."""
     recipe = models.ForeignKey(
         Recipe,
         verbose_name='Рецепт',
@@ -159,6 +161,7 @@ class RecipeIngredient(models.Model):
 
 
 class Follow(models.Model):
+    """Подписки."""
     user = models.ForeignKey(
         User,
         verbose_name='Пользователь',
@@ -184,6 +187,7 @@ class Follow(models.Model):
 
 
 class Favorite(models.Model):
+    """Фавориты."""
     user = models.ForeignKey(
         User,
         verbose_name='Пользователь',
@@ -203,3 +207,27 @@ class Favorite(models.Model):
         ]
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
+
+
+class ShopList(models.Model):
+    """Список покупок."""
+    user = models.ForeignKey(
+        User,
+        verbose_name='Пользователь',
+        on_delete=models.CASCADE,
+        related_name='shoplists'
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        verbose_name='Рецепт',
+        on_delete=models.CASCADE,
+        related_name='shoplists'
+    )
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=['user', 'recipe'], name='unique shoplist')
+        ]
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Списоки покупок'
+        ordering = ['user', 'recipe']

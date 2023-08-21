@@ -104,7 +104,6 @@ def create_favorite_model(
 class Command(BaseCommand):
     help = 'Загрузка данных из CSV файлов'
     link_models = (
-        ('users.csv')
         ('ingredients.csv', Ingredient, create_simple_model),
         ('tags.csv', Tag, create_simple_model),
         ('recipe.csv', Recipe, create_recipe_model),
