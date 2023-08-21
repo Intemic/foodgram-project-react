@@ -5,7 +5,7 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from .models import Ingredient, Recipe, Tag
 from .filters import RecipeFilter
 from .pagination import PageLimitPagination
-from .serializers import IngredientSerializer, RecipeSerializer, TagSerializer
+from .serializers import IngredientSerializer, RecipeSerializer, RecipeCreateSerializer, TagSerializer
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -36,3 +36,8 @@ class RecipeViewSet(ModelViewSet):
         'tags',
     )
     pagination_class = PageLimitPagination
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.request.method in ('POST', 'PATCH'):
+            return RecipeCreateSerializer
+        return super().get_serializer_class()

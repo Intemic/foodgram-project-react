@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import Ingredient, Recipe, RecipeIngredient, Tag
+from core.constants import FIELD_LENGTH
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -22,6 +23,12 @@ class IngredientSerializer(serializers.ModelSerializer):
             'name',
             'measurement_unit',
         )
+
+
+class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RecipeIngredient
+        fields = ('id', 'amount')
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
@@ -77,3 +84,37 @@ class RecipeSerializer(serializers.ModelSerializer):
         if user.is_authenticated:
             return user.shoplists.filter(recipe=obj.id).exists()
         return False
+    
+
+class RecipeCreateSerializer(serializers.ModelSerializer):
+    ingredients = RecipeIngredientCreateSerializer(
+        source='rec_ingrs',
+        many=True
+    )
+    name = serializers.CharField(
+        max_length=FIELD_LENGTH['NAME']
+    )
+
+    class Meta:
+        model = Recipe
+        fields = (
+            'ingredients',
+            'tags',
+            # 'image',
+            'name',
+            'text',
+            'cooking_time',
+        )
+        
+
+
+    def validate_cooking_time(self, value):
+        if value < 1:
+            raise serializers.ValidationError('Введите значение больше или равно 1 мин!')
+        return value
+    
+    def create(self, validated_data):
+        ingredients = validated_data.pop('ingredients', '')
+
+        recipe = Recipe.objects.create(**validated_data)
+        return recipe
