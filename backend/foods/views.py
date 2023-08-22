@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
@@ -7,8 +6,6 @@ from .models import Ingredient, Recipe, Tag
 from .filters import RecipeFilter
 from .pagination import PageLimitPagination
 from .serializers import IngredientSerializer, RecipeSerializer, RecipeCreateSerializer, TagSerializer
-
-User = get_user_model()
 
 
 class TagViewSet(ReadOnlyModelViewSet):
