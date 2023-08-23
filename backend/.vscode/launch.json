@@ -26,7 +26,7 @@
                 "runserver"
             ],
             "django": true,
-            "justMyCode": true
+            "justMyCode": false
         },
         {
             "name": "Test Django",
