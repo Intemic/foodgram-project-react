@@ -57,9 +57,9 @@ class UserCreateSerializers(serializers.ModelSerializer):
     last_name = serializers.CharField(
         max_length=FIELD_LENGTH['LAST_NAME']
     )
-    password = serializers.CharField(
-        max_length=FIELD_LENGTH['PASSWORD']
-    )
+    # password = serializers.CharField(
+    #     max_length=FIELD_LENGTH['PASSWORD']
+    # )
 
     class Meta:
         model = User
