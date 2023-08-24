@@ -9,4 +9,4 @@ FIELD_LENGTH = {
     'LAST_NAME': 150,
 }
 
-USERNAME_PATTERN = r'[\w.@+-]+'
+USERNAME_PATTERN = r'^[\w.@+-]+'
