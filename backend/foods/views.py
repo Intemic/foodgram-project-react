@@ -6,7 +6,7 @@ from rest_framework.viewsets import ModelViewSet, GenericViewSet, ReadOnlyModelV
 from .models import Ingredient, Favorite, Recipe, Tag
 from .filters import RecipeFilter
 from  core.pagination import PageLimitPagination
-from .serializers import IngredientSerializer, FollowSerializer, RecipeSerializer, RecipeCreateSerializer, TagSerializer
+from .serializers import IngredientSerializer, RecipeSerializer, RecipeCreateSerializer, TagSerializer
 
 
 class TagViewSet(ReadOnlyModelViewSet):

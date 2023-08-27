@@ -6,8 +6,9 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import models
 
-from foods.models import (Favorite, Follow, Ingredient, Recipe,
+from foods.models import (Favorite, Ingredient, Recipe,
                           RecipeIngredient, RecipeTag, Tag)
+from users.models import Follow
 from users.models import User
 
 

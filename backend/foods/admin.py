@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from .models import Favorite, Follow, Ingredient, Recipe, ShopList, Tag
+from .models import Favorite, Ingredient, Recipe, ShopList, Tag
 
 
 class TagsInline(admin.TabularInline):
@@ -30,13 +30,6 @@ class Ingredient(admin.ModelAdmin):
 @admin.register(Favorite)
 class Favorite(admin.ModelAdmin):
     list_display = ('id', 'user', 'recipe', )
-    list_filter = ('user', )
-    empty_value_display = '-пусто-'
-
-
-@admin.register(Follow)
-class Follow(admin.ModelAdmin):
-    list_display = ('id', 'user', 'following', )
     list_filter = ('user', )
     empty_value_display = '-пусто-'
 

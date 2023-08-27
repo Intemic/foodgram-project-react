@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from .models import Ingredient, Favorite, Follow, Recipe, RecipeIngredient, RecipeTag, Tag 
+from .models import Ingredient, Favorite, Recipe, RecipeIngredient, RecipeTag, Tag 
 from core.constants import FIELD_LENGTH
 
 
@@ -196,38 +196,3 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 #             'image',
 #             'cooking_time'
 #         )
-
-
-class FollowSerializer(serializers.ModelSerializer):
-    # user = serializers.SlugRelatedField(
-    #     read_only=True, slug_field='username',
-    #     default=serializers.CurrentUserDefault()
-    # )
-    # following = serializers.SlugRelatedField(
-    #     queryset=User.objects.all(),
-    #     slug_field='username'
-    # )
-
-    class Meta:
-        # fields = (
-        #     'user',
-        #     'following',
-        # )
-        model = Follow
-        validators = [
-            UniqueTogetherValidator(
-                queryset=Follow.objects.all(),
-                fields=('user', 'following')
-            )
-        ]
-
-    def validate_following(self, data):
-        user = self.context['request'].user
-        if user == data:
-            raise serializers.ValidationError(
-                {'following': 'Подписка на себя недопустима'}
-            )
-        return data
-    
-    def to_representation(self, instance):
-        return super().to_representation(instance)
