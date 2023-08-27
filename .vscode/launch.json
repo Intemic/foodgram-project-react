@@ -16,7 +16,8 @@
             "name": "Django",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}\\api_yamdb\\manage.py",
+            "cwd": "${workspaceFolder}/backend/",
+            "program": "manage.py",
             "args": [
                 "runserver"
             ],

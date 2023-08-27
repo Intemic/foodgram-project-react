@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import User
 from .serializers import UserCreateSerializers, UserSerializers
+from core.pagination import PageLimitPagination
 
 
 class UserViewSet(ModelViewSet):
@@ -13,6 +14,7 @@ class UserViewSet(ModelViewSet):
     permission_classes = (permissions.AllowAny,)
     queryset = User.objects.all()
     http_method_names = ['get', 'post']
+    pagination_class = PageLimitPagination
 
     @action(
         url_path='me',
@@ -35,3 +37,6 @@ class UserViewSet(ModelViewSet):
         if self.request.method in ('POST',):
             return UserCreateSerializers
         return super().get_serializer_class()
+    
+    def get_paginated_response(self, data):
+        return super().get_paginated_response(data)

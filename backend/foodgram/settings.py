@@ -64,7 +64,7 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'bd/db.sqlite3',
     }
 }
 
@@ -125,11 +125,11 @@ DJOSER = {
         # 'password_reset': ['rest_framework.permissions.AllowAny'],
         # 'token_destroy': ['rest_framework.permissions.IsAuthenticated'],
     },
-    'SERIALIZERS': 
-    {
-        'user': 'users.serializers.UserSerializers',
-        'user_create': 'users.serializers.UserCreateSerializers',
-        'current_user': 'users.serializers.UserSerializers',
-    },
+    # 'SERIALIZERS': 
+    # {
+    #     'user': 'users.serializers.UserSerializers',
+    #     'user_create': 'users.serializers.UserCreateSerializers',
+    #     'current_user': 'users.serializers.UserSerializers',
+    # },
 
 }

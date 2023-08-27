@@ -1,11 +1,15 @@
 import base64
 
 from django.core.files.base import ContentFile
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator
 
-from .models import Ingredient, Recipe, RecipeIngredient, RecipeTag, Tag 
+from .models import Ingredient, Favorite, Follow, Recipe, RecipeIngredient, RecipeTag, Tag 
 from core.constants import FIELD_LENGTH
 
+
+User = get_user_model()
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -138,7 +142,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
-     
+
         recipe = Recipe.objects.create(**validated_data)
         for ing in ingredients:
             RecipeIngredient.objects.create(
@@ -176,3 +180,54 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return RecipeSerializer(instance).data
+
+
+# class FavoriteSerializer(serializers.ModelSerializer):
+#     id = serializers.ReadOnlyField(source='recipe.id')
+#     name = serializers.ReadOnlyField(source='recipe.name')
+#     image = serializers.ReadOnlyField(source='recipe.image')
+#     cooking_time = serializers.ReadOnlyField(source='recipe.cooking_time')
+
+#     class Meta:
+#         model = Favorite
+#         fields = (
+#             'id',
+#             'name',
+#             'image',
+#             'cooking_time'
+#         )
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    # user = serializers.SlugRelatedField(
+    #     read_only=True, slug_field='username',
+    #     default=serializers.CurrentUserDefault()
+    # )
+    # following = serializers.SlugRelatedField(
+    #     queryset=User.objects.all(),
+    #     slug_field='username'
+    # )
+
+    class Meta:
+        # fields = (
+        #     'user',
+        #     'following',
+        # )
+        model = Follow
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=('user', 'following')
+            )
+        ]
+
+    def validate_following(self, data):
+        user = self.context['request'].user
+        if user == data:
+            raise serializers.ValidationError(
+                {'following': 'Подписка на себя недопустима'}
+            )
+        return data
+    
+    def to_representation(self, instance):
+        return super().to_representation(instance)

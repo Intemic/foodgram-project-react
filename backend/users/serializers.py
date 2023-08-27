@@ -3,6 +3,10 @@ from core.constants import FIELD_LENGTH
 from core.validators import username_validator
 from django.core.validators import validate_email
 from rest_framework.validators import UniqueValidator
+from djoser.serializers import UserCreateSerializer, UserSerializer
+from django.contrib.auth.password_validation import validate_password as validate_passwd
+from django.core.exceptions import ValidationError
+
 
 from .models import User
 
@@ -57,9 +61,11 @@ class UserCreateSerializers(serializers.ModelSerializer):
     last_name = serializers.CharField(
         max_length=FIELD_LENGTH['LAST_NAME']
     )
-    # password = serializers.CharField(
-    #     max_length=FIELD_LENGTH['PASSWORD']
-    # )
+    password = serializers.CharField(
+        style={"input_type": "password"},
+        max_length=FIELD_LENGTH['PASSWORD'],
+        write_only=True,
+    )
 
     class Meta:
         model = User
@@ -70,8 +76,24 @@ class UserCreateSerializers(serializers.ModelSerializer):
             'last_name',
             'password',
         )
+    
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = User.objects.create(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
+
+    def validate_password(self, value):
+        try:
+            validate_passwd(value, self.context['request'].user)
+        except ValidationError:
+            raise serializers.ValidationError(
+                'Некорретный пароль'
+            )
+        return value
 
     def to_representation(self, instance):
         serializer_data = UserSerializers(instance).data
-        serializer_data.pop('is_subscribed') 
+        serializer_data.pop('is_subscribed')
         return serializer_data
