@@ -3,13 +3,13 @@ from core.constants import FIELD_LENGTH
 from core.validators import username_validator
 from django.core.validators import validate_email
 from rest_framework.validators import UniqueValidator
-from djoser.serializers import UserCreateSerializer, UserSerializer
+# from djoser.serializers import UserCreateSerializer, UserSerializer
 from django.contrib.auth.password_validation import validate_password as validate_passwd
 from django.core.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
 from .models import Follow, User
-
+from foods.serializers import RecipeShortSerializer
 
 class UserSerializers(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField(
@@ -99,16 +99,7 @@ class UserCreateSerializers(serializers.ModelSerializer):
         return serializer_data
 
 
-class FollowSerializer(serializers.ModelSerializer):
-    # user = serializers.SlugRelatedField(
-    #     read_only=True, slug_field='username',
-    #     default=serializers.CurrentUserDefault()
-    # )
-    # following = serializers.SlugRelatedField(
-    #     queryset=User.objects.all(),
-    #     slug_field='username'
-    # )
-
+class FollowCreateSerializer(serializers.ModelSerializer):
     class Meta:
         fields = (
             'user',
@@ -118,18 +109,45 @@ class FollowSerializer(serializers.ModelSerializer):
         validators = [
             UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
-                fields=('user', 'following')
+                fields=('user', 'following'),
+                message='Пользователь уже подписан на данного автора'
             )
         ]
 
-    def validate_following(self, data):
-        user = self.context['request'].user
-        if user == data:
+    def validate(self, attrs):
+        if attrs['user'].id == attrs['following'].id:
             raise serializers.ValidationError(
                 {'following': 'Подписка на себя недопустима'}
-            )
-        return data
+            ) 
+
+        return attrs
     
     def to_representation(self, instance):
-        user_serializer = UserSerializer(instance.following)
-        return super().to_representation(instance)
+        return FollowSerializer(instance).data
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+            'is_subscribed',
+            'recipes',
+            'recipes_count'
+        )
+        model = Follow
+
+    def to_representation(self, instance):
+        user_data = UserSerializers(instance.following).data
+        recipe_data = RecipeShortSerializer(
+            instance.following.recipes,
+            many=True
+        ).data
+        return {
+            **user_data,
+            'recipes': recipe_data,
+            'recipes_count': instance.following.recipes.count()
+        }

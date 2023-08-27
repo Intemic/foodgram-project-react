@@ -1,11 +1,15 @@
+from django.shortcuts import get_object_or_404
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from rest_framework.exceptions import ValidationError
 
-from .models import User
-from .serializers import FollowSerializer, UserCreateSerializers, UserSerializers
+from .models import Follow, User
+from .serializers import FollowCreateSerializer, FollowSerializer, UserCreateSerializers, UserSerializers
 from core.pagination import PageLimitPagination
 from core.views import CreateDestroyViewSet
 
@@ -14,7 +18,7 @@ class UserViewSet(ModelViewSet):
     serializer_class = UserSerializers
     permission_classes = (permissions.AllowAny,)
     queryset = User.objects.all()
-    http_method_names = ['get', 'post']
+    http_method_names = ['get', 'post', 'delete']
     pagination_class = PageLimitPagination
 
     @action(
@@ -34,21 +38,65 @@ class UserViewSet(ModelViewSet):
     def set_password(self, request):
         pass
 
+    @action(
+        permission_classes=[IsAuthenticated],
+        detail=True,
+        methods=['post', 'delete']
+    )
+    def subscribe(self, request, pk):
+        following = get_object_or_404(User, pk=pk)
+
+        if request.method == 'POST':
+            serializer = FollowCreateSerializer(
+                data={'user': request.user.id, 'following': following.id})
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        try:
+            follow = Follow.objects.get(user=self.request.user.id, following=pk)
+        except ObjectDoesNotExist:
+            return Response(
+                {"errors": 'Пользователь не подписан на данного автора'},
+                status=status.HTTP_400_BAD_REQUEST)
+
+        follow.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(
+        permission_classes=[IsAuthenticated],
+        detail=False            
+    )
+    def subscriptions(self, request):
+        users = request.user.follower.all()
+        recipes_limit = self.request.query_params.get('recipes_limit')
+        page = self.paginate_queryset(users)
+        serializer = FollowSerializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
+
     def get_serializer_class(self):
         if self.request.method in ('POST',):
             return UserCreateSerializers
         return super().get_serializer_class()
     
-    def get_paginated_response(self, data):
-        return super().get_paginated_response(data)
+    # def get_paginated_response(self, data):
+    #     return super().get_paginated_response(data)
     
 
-class FollowViewSet(CreateDestroyViewSet):
-    serializer_class = FollowSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+# class FollowViewSet(CreateDestroyViewSet):
+#     serializer_class = FollowCreateSerializer
 
-    def get_queryset(self):
-        return self.request.user.follower.all()
+#     def create(self, request, *args, **kwargs):
+#         following = get_object_or_404(User, pk=kwargs['user_id'])
+#         serializer = FollowCreateSerializer(
+#             data={'user': request.user.id,
+#                   'following': following.id
+#                   }
+#         )
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+#     def get_queryset(self):
+#         return self.request.user.follower.all()
