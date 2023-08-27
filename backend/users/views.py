@@ -5,8 +5,9 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
 from .models import User
-from .serializers import UserCreateSerializers, UserSerializers
+from .serializers import FollowSerializer, UserCreateSerializers, UserSerializers
 from core.pagination import PageLimitPagination
+from core.views import CreateDestroyViewSet
 
 
 class UserViewSet(ModelViewSet):
@@ -40,3 +41,14 @@ class UserViewSet(ModelViewSet):
     
     def get_paginated_response(self, data):
         return super().get_paginated_response(data)
+    
+
+class FollowViewSet(CreateDestroyViewSet):
+    serializer_class = FollowSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get_queryset(self):
+        return self.request.user.follower.all()
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

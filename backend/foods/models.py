@@ -162,32 +162,6 @@ class RecipeIngredient(models.Model):
         verbose_name_plural = 'Рецепт, Ингредиенты'
 
 
-class Follow(models.Model):
-    """Подписки."""
-    user = models.ForeignKey(
-        User,
-        verbose_name='Пользователь',
-        on_delete=models.CASCADE,
-        related_name='follower'
-    )
-    following = models.ForeignKey(
-        User,
-        verbose_name='Автор',
-        on_delete=models.CASCADE,
-        related_name='following'
-    )
-
-    class Meta:
-        constraints = [
-            UniqueConstraint(
-                fields=['user', 'following'],
-                name='unique following'
-            )
-        ]
-        verbose_name = 'Подписки'
-        verbose_name_plural = 'Подписки'
-
-
 class Favorite(models.Model):
     """Фавориты."""
     user = models.ForeignKey(

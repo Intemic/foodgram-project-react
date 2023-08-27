@@ -2,20 +2,11 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions
 from rest_framework.viewsets import ModelViewSet, GenericViewSet, ReadOnlyModelViewSet
-from rest_framework.mixins import CreateModelMixin, DestroyModelMixin, ListModelMixin
 
 from .models import Ingredient, Favorite, Recipe, Tag
 from .filters import RecipeFilter
 from  core.pagination import PageLimitPagination
 from .serializers import IngredientSerializer, FollowSerializer, RecipeSerializer, RecipeCreateSerializer, TagSerializer
-
-
-class CreateDestroyViewSet(
-    CreateModelMixin,
-    DestroyModelMixin,
-    GenericViewSet
-):
-    pass
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -80,13 +71,3 @@ class RecipeViewSet(ModelViewSet):
 #         recipe = get_object_or_404(Recipe, pk=self.kwargs.get('recipe_id'))
 
 #         return super().perform_destroy(instance)
-
-class FollowViewSet(CreateDestroyViewSet):
-    serializer_class = FollowSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-
-    def get_queryset(self):
-        return self.request.user.follower.all()
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)

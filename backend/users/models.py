@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import validate_email
 from django.db import models
+from django.db.models import UniqueConstraint
 
 from core.constants import FIELD_LENGTH
 from core.validators import username_validator
@@ -40,3 +41,29 @@ class User(AbstractUser):
 
     def __str__(self) -> str:
         return self.get_full_name()[:50]
+    
+
+class Follow(models.Model):
+    """Подписки."""
+    user = models.ForeignKey(
+        User,
+        verbose_name='Пользователь',
+        on_delete=models.CASCADE,
+        related_name='follower'
+    )
+    following = models.ForeignKey(
+        User,
+        verbose_name='Автор',
+        on_delete=models.CASCADE,
+        related_name='following'
+    )
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=['user', 'following'],
+                name='unique following'
+            )
+        ]
+        verbose_name = 'Подписки'
+        verbose_name_plural = 'Подписки'

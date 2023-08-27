@@ -6,9 +6,9 @@ from rest_framework.validators import UniqueValidator
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from django.contrib.auth.password_validation import validate_password as validate_passwd
 from django.core.exceptions import ValidationError
+from rest_framework.validators import UniqueTogetherValidator
 
-
-from .models import User
+from .models import Follow, User
 
 
 class UserSerializers(serializers.ModelSerializer):
@@ -97,3 +97,39 @@ class UserCreateSerializers(serializers.ModelSerializer):
         serializer_data = UserSerializers(instance).data
         serializer_data.pop('is_subscribed')
         return serializer_data
+
+
+class FollowSerializer(serializers.ModelSerializer):
+    # user = serializers.SlugRelatedField(
+    #     read_only=True, slug_field='username',
+    #     default=serializers.CurrentUserDefault()
+    # )
+    # following = serializers.SlugRelatedField(
+    #     queryset=User.objects.all(),
+    #     slug_field='username'
+    # )
+
+    class Meta:
+        fields = (
+            'user',
+            'following',
+        )
+        model = Follow
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=('user', 'following')
+            )
+        ]
+
+    def validate_following(self, data):
+        user = self.context['request'].user
+        if user == data:
+            raise serializers.ValidationError(
+                {'following': 'Подписка на себя недопустима'}
+            )
+        return data
+    
+    def to_representation(self, instance):
+        user_serializer = UserSerializer(instance.following)
+        return super().to_representation(instance)
