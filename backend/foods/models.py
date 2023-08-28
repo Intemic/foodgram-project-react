@@ -1,9 +1,8 @@
-from django.core.validators import MinValueValidator
+from core.constants import FIELD_LENGTH
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
-
-from core.constants import FIELD_LENGTH
 
 User = get_user_model()
 
@@ -13,7 +12,8 @@ class Name(models.Model):
     name = models.CharField(
         verbose_name='Название',
         max_length=FIELD_LENGTH['NAME'],
-        help_text='Название'
+        help_text='Название',
+        unique=True
     )
 
     class Meta:
@@ -132,7 +132,8 @@ class RecipeIngredient(models.Model):
         Recipe,
         verbose_name='Рецепт',
         on_delete=models.CASCADE,
-        related_name='rec_ingrs'
+        related_name='rec_ingrs',
+        db_index=True
     )
     ingredient = models.ForeignKey(
         Ingredient,

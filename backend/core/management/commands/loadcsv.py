@@ -5,11 +5,9 @@ from pathlib import Path
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import models
-
-from foods.models import (Favorite, Ingredient, Recipe,
-                          RecipeIngredient, RecipeTag, Tag)
-from users.models import Follow
-from users.models import User
+from foods.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                          RecipeTag, Tag)
+from users.models import Follow, User
 
 
 def create_simple_model(file_data: csv.DictReader, model: models.Model):
@@ -106,16 +104,16 @@ class Command(BaseCommand):
     help = 'Загрузка данных из CSV файлов'
     link_models = (
         ('ingredients.csv', Ingredient, create_simple_model),
-        ('tags.csv', Tag, create_simple_model),
-        ('recipe.csv', Recipe, create_recipe_model),
-        ('recipetag.csv', RecipeTag, create_recipe_tag_model),
-        (
-            'recipeingredient.csv',
-            RecipeIngredient,
-            create_recipe_ingredient_model
-        ),
-        ('follow.csv', Follow, create_follow_model),
-        ('favorite.csv', Favorite, create_favorite_model),
+        # ('tags.csv', Tag, create_simple_model),
+        # ('recipe.csv', Recipe, create_recipe_model),
+        # ('recipetag.csv', RecipeTag, create_recipe_tag_model),
+        # (
+        #     'recipeingredient.csv',
+        #     RecipeIngredient,
+        #     create_recipe_ingredient_model
+        # ),
+        # ('follow.csv', Follow, create_follow_model),
+        # ('favorite.csv', Favorite, create_favorite_model),
     )
 
     def handle(self, *args, **options):

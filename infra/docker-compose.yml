@@ -3,7 +3,7 @@ version: '3.3'
 volumes:
   static:
   media:
-  pg_data:  
+  # pg_data:  
 
 services:
   backend:
@@ -12,14 +12,16 @@ services:
     volumes:
       - static:/backend_static
       - media:/app/media
-      - pg_data:/app/bd
+      # - pg_data:/app/bd
+      - ../backend/bd:/app/bd
+      - ../backend:/app
   frontend:
     build:
       context: ../frontend
       dockerfile: Dockerfile
     volumes:
       - static:/app/result_build/build
-#      - ../frontend/:/app/result_build/
+      #- ../frontend/:/app
     depends_on:
       - backend
   nginx:

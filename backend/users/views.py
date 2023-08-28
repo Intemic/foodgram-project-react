@@ -1,17 +1,17 @@
-from django.shortcuts import get_object_or_404
-from django.core.exceptions import ObjectDoesNotExist
-from rest_framework import permissions
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
-from rest_framework.exceptions import ValidationError
-
-from .models import Follow, User
-from .serializers import FollowCreateSerializer, FollowSerializer, UserCreateSerializers, UserSerializers
 from core.pagination import PageLimitPagination
 from core.views import CreateDestroyViewSet
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import get_object_or_404
+from rest_framework import permissions, status
+from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+
+from .models import Follow, User
+from .serializers import (FollowCreateSerializer, FollowSerializer,
+                          UserCreateSerializers, UserSerializers)
 
 
 class UserViewSet(ModelViewSet):
@@ -83,21 +83,3 @@ class UserViewSet(ModelViewSet):
         if self.request.method in ('POST',):
             return UserCreateSerializers
         return super().get_serializer_class()
-
-
-# class FollowViewSet(CreateDestroyViewSet):
-#     serializer_class = FollowCreateSerializer
-
-#     def create(self, request, *args, **kwargs):
-#         following = get_object_or_404(User, pk=kwargs['user_id'])
-#         serializer = FollowCreateSerializer(
-#             data={'user': request.user.id,
-#                   'following': following.id
-#                   }
-#         )
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-#     def get_queryset(self):
-#         return self.request.user.follower.all()

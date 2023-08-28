@@ -1,15 +1,16 @@
-from rest_framework import serializers
 from core.constants import FIELD_LENGTH
 from core.validators import username_validator
-from django.core.validators import validate_email
-from rest_framework.validators import UniqueValidator
 # from djoser.serializers import UserCreateSerializer, UserSerializer
-from django.contrib.auth.password_validation import validate_password as validate_passwd
+from django.contrib.auth.password_validation import \
+    validate_password as validate_passwd
 from django.core.exceptions import ValidationError
-from rest_framework.validators import UniqueTogetherValidator
+from django.core.validators import validate_email
+from foods.models import Recipe
+from rest_framework import serializers
+from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
 from .models import Follow, User
-from foods.serializers import RecipeSerializer, RecipeShortSerializer
+
 
 class UserSerializers(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField(
@@ -28,9 +29,13 @@ class UserSerializers(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        # if self.context:
-        #     user = self.context['request'].user
-
+        req = self.context.get('request')
+        if req:
+            if (
+                req.user.is_authenticated and 
+                req.user.following.filter(user=obj.id).exists()
+            ):
+                return True
         return False
 
 
@@ -141,7 +146,7 @@ class FollowSerializer(serializers.ModelSerializer):
         model = Follow
 
     def to_representation(self, instance):
-        recipes_limit = int(self.context.get('recipes_limit', None))
+        recipes_limit = int(self.context.get('recipes_limit', 0))
         user_data = UserSerializers(instance.following).data
         if recipes_limit:
             recipes = instance.following.recipes.all()[:recipes_limit]
@@ -156,3 +161,14 @@ class FollowSerializer(serializers.ModelSerializer):
             'recipes': recipe_data,
             'recipes_count': instance.following.recipes.count()
         }
+
+
+class RecipeShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Recipe
+        fields = (
+            'id',
+            'name',
+            'image',
+            'cooking_time',
+        )

@@ -1,45 +1,18 @@
 import base64
 
-from django.core.files.base import ContentFile
+from core.constants import FIELD_LENGTH
 from django.contrib.auth import get_user_model
+from django.core.files.base import ContentFile
+from django.utils.module_loading import import_string
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
+from users.serializers import UserSerializers
 
-from .models import Ingredient, Favorite, Recipe, RecipeIngredient, RecipeTag, ShopList, Tag 
-from core.constants import FIELD_LENGTH
-
+from .models import (Favorite, Ingredient, Recipe, RecipeIngredient, RecipeTag,
+                     ShopList, Tag)
 
 User = get_user_model()
 
-
-# class UserRecipeSerializer(serializers.ModelSerializer):
-#     source = 'избранном'
-    
-#     class Meta:
-#         fields = (
-#             'user',
-#             'recipe',
-#         )
-#         model = Favorite
-#         validators = [
-#             UniqueTogetherValidator(
-#                 queryset=Favorite.objects.all(),
-#                 fields=('user', 'recipe'),
-#                 message= f'Рецепт уже находится в {source}'
-#             )
-#         ]
-
-#     # def validate(self, attrs):
-#     #     if attrs['user'].id == attrs['recipe'].author.id:
-#     #         raise serializers.ValidationError(
-#     #             {'following': 'Недопустимо добавить свой рецепт в избранное'}
-#     #         ) 
-
-#     #     return attrs
-    
-#     def to_representation(self, instance):
-#         return RecipeShortSerializer(instance.recipe).data   
-        
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -95,6 +68,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         source='rec_ingrs',
         many=True
     )
+    author = UserSerializers()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
 
@@ -137,7 +111,7 @@ class RecipeShortSerializer(serializers.ModelSerializer):
             'image',
             'cooking_time',
         )
-    
+
 
 class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):

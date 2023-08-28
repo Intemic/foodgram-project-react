@@ -1,16 +1,18 @@
+from core.pagination import PageLimitPagination
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from django.core.exceptions import ObjectDoesNotExist
+from rest_framework import filters, permissions, status
 from rest_framework.decorators import action
-from rest_framework import filters, permissions
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet, GenericViewSet, ReadOnlyModelViewSet
-from rest_framework import status
+from rest_framework.viewsets import (GenericViewSet, ModelViewSet,
+                                     ReadOnlyModelViewSet)
 
-from .models import Ingredient, Favorite, Recipe, ShopList, Tag
-from .filters import RecipeFilter
-from  core.pagination import PageLimitPagination
-from .serializers import IngredientSerializer, FavoriteCreateSerializer, RecipeSerializer, RecipeCreateSerializer, ShopListCreateSerializer, TagSerializer
+from .filters import IngredientFilter, RecipeFilter
+from .models import Favorite, Ingredient, Recipe, ShopList, Tag
+from .serializers import (FavoriteCreateSerializer, IngredientSerializer,
+                          RecipeCreateSerializer, RecipeSerializer,
+                          ShopListCreateSerializer, TagSerializer)
 
 
 class TagViewSet(ReadOnlyModelViewSet):
@@ -23,7 +25,7 @@ class IngredientViewSet(ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     permission_classes = (permissions.AllowAny,)
     serializer_class = IngredientSerializer
-    filter_backends = (filters.SearchFilter,)
+    filter_backends = (IngredientFilter, )
     search_fields = ('^name',)
 
 

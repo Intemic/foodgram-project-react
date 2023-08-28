@@ -1,8 +1,7 @@
 import re
 
-from django.core.exceptions import ValidationError
-
 from core.constants import USERNAME_PATTERN
+from django.core.exceptions import ValidationError
 
 
 def username_validator(value):

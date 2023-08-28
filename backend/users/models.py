@@ -1,10 +1,9 @@
+from core.constants import FIELD_LENGTH
+from core.validators import username_validator
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import validate_email
 from django.db import models
 from django.db.models import UniqueConstraint
-
-from core.constants import FIELD_LENGTH
-from core.validators import username_validator
 
 
 class User(AbstractUser):
