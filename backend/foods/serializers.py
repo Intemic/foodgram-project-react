@@ -5,11 +5,41 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
-from .models import Ingredient, Favorite, Recipe, RecipeIngredient, RecipeTag, Tag 
+from .models import Ingredient, Favorite, Recipe, RecipeIngredient, RecipeTag, ShopList, Tag 
 from core.constants import FIELD_LENGTH
 
 
 User = get_user_model()
+
+
+# class UserRecipeSerializer(serializers.ModelSerializer):
+#     source = 'избранном'
+    
+#     class Meta:
+#         fields = (
+#             'user',
+#             'recipe',
+#         )
+#         model = Favorite
+#         validators = [
+#             UniqueTogetherValidator(
+#                 queryset=Favorite.objects.all(),
+#                 fields=('user', 'recipe'),
+#                 message= f'Рецепт уже находится в {source}'
+#             )
+#         ]
+
+#     # def validate(self, attrs):
+#     #     if attrs['user'].id == attrs['recipe'].author.id:
+#     #         raise serializers.ValidationError(
+#     #             {'following': 'Недопустимо добавить свой рецепт в избранное'}
+#     #         ) 
+
+#     #     return attrs
+    
+#     def to_representation(self, instance):
+#         return RecipeShortSerializer(instance.recipe).data   
+        
 
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
@@ -193,17 +223,55 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         return RecipeSerializer(instance).data
 
 
-# class FavoriteSerializer(serializers.ModelSerializer):
-#     id = serializers.ReadOnlyField(source='recipe.id')
-#     name = serializers.ReadOnlyField(source='recipe.name')
-#     image = serializers.ReadOnlyField(source='recipe.image')
-#     cooking_time = serializers.ReadOnlyField(source='recipe.cooking_time')
+class FavoriteCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = (
+            'user',
+            'recipe',
+        )
+        model = Favorite
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Favorite.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже находится в избранном'
+            )
+        ]
 
-#     class Meta:
-#         model = Favorite
-#         fields = (
-#             'id',
-#             'name',
-#             'image',
-#             'cooking_time'
-#         )
+    def validate(self, attrs):
+        if attrs['user'].id == attrs['recipe'].author.id:
+            raise serializers.ValidationError(
+                {'following': 'Недопустимо добавить свой рецепт в избранное'}
+            ) 
+
+        return attrs
+    
+    def to_representation(self, instance):
+        return RecipeShortSerializer(instance.recipe).data
+
+
+class ShopListCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = (
+            'user',
+            'recipe',
+        )
+        model = ShopList
+        validators = [
+            UniqueTogetherValidator(
+                queryset=ShopList.objects.all(),
+                fields=('user', 'recipe'),
+                message='Рецепт уже находится в избранном'
+            )
+        ]
+
+    # def validate(self, attrs):
+    #     if attrs['user'].id == attrs['recipe'].author.id:
+    #         raise serializers.ValidationError(
+    #             {'following': 'Недопустимо добавить свой рецепт в избранное'}
+    #         ) 
+
+    #     return attrs
+    
+    def to_representation(self, instance):
+        return RecipeShortSerializer(instance.recipe).data

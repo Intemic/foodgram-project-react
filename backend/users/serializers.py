@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError
 from rest_framework.validators import UniqueTogetherValidator
 
 from .models import Follow, User
-from foods.serializers import RecipeShortSerializer
+from foods.serializers import RecipeSerializer, RecipeShortSerializer
 
 class UserSerializers(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField(
@@ -141,9 +141,14 @@ class FollowSerializer(serializers.ModelSerializer):
         model = Follow
 
     def to_representation(self, instance):
+        recipes_limit = int(self.context.get('recipes_limit', None))
         user_data = UserSerializers(instance.following).data
+        if recipes_limit:
+            recipes = instance.following.recipes.all()[:recipes_limit]
+        else:
+            recipes = instance.following.recipes.all()
         recipe_data = RecipeShortSerializer(
-            instance.following.recipes,
+            recipes,
             many=True
         ).data
         return {

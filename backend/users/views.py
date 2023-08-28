@@ -69,20 +69,21 @@ class UserViewSet(ModelViewSet):
     )
     def subscriptions(self, request):
         users = request.user.follower.all()
-        recipes_limit = self.request.query_params.get('recipes_limit')
         page = self.paginate_queryset(users)
-        serializer = FollowSerializer(page, many=True)
+        serializer = FollowSerializer(
+            page,
+            many=True,
+            context={
+                'recipes_limit': self.request.query_params.get('recipes_limit')
+            }
+        )
         return self.get_paginated_response(serializer.data)
-
 
     def get_serializer_class(self):
         if self.request.method in ('POST',):
             return UserCreateSerializers
         return super().get_serializer_class()
-    
-    # def get_paginated_response(self, data):
-    #     return super().get_paginated_response(data)
-    
+
 
 # class FollowViewSet(CreateDestroyViewSet):
 #     serializer_class = FollowCreateSerializer
