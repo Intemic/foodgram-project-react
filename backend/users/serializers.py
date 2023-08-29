@@ -1,13 +1,14 @@
-from core.constants import FIELD_LENGTH
-from core.validators import username_validator
 # from djoser.serializers import UserCreateSerializer, UserSerializer
 from django.contrib.auth.password_validation import \
     validate_password as validate_passwd
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from foods.models import Recipe
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
+
+from core.constants import FIELD_LENGTH
+from core.validators import username_validator
+from foods.models import Recipe
 
 from .models import Follow, User
 

@@ -1,14 +1,14 @@
-from core.pagination import PageLimitPagination
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Sum
-from rest_framework import filters, permissions, status
+from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.viewsets import (GenericViewSet, ModelViewSet,
-                                     ReadOnlyModelViewSet)
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
+from core.pagination import PageLimitPagination
 from .filters import IngredientFilter, RecipeFilter
 from .models import Favorite, Ingredient, Recipe, ShopList, Tag
 from .serializers import (FavoriteCreateSerializer, IngredientSerializer,
@@ -72,7 +72,10 @@ class RecipeViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         try:
-            favorite = Favorite.objects.get(user=self.request.user.id, recipe=pk)
+            favorite = Favorite.objects.get(
+                user=self.request.user.id,
+                recipe=pk
+            )
         except ObjectDoesNotExist:
             return Response(
                 {"errors": 'Рецепт отсутствует в избранном'},
@@ -80,7 +83,6 @@ class RecipeViewSet(ModelViewSet):
 
         favorite.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
     @action(
         permission_classes=[permissions.IsAuthenticated],
@@ -98,7 +100,10 @@ class RecipeViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         try:
-            shoplist = ShopList.objects.get(user=self.request.user.id, recipe=pk)
+            shoplist = ShopList.objects.get(
+                user=self.request.user.id,
+                recipe=pk
+            )
         except ObjectDoesNotExist:
             return Response(
                 {"errors": 'Рецепт отсутствует в списке покупок'},
@@ -112,17 +117,25 @@ class RecipeViewSet(ModelViewSet):
         detail=False,
     )
     def download_shopping_cart(self, request):
-        shoplists = request.user.shoplists.annotate(name=('recipe__rec_ingrs__name'), amount=Sum('recipe__rec_ingrs__amount')) #all()
-        # recipe_in = Recipe.objects.filter(shoplists__in=shoplists)
-        # shoplists__recipe.ingredients.all() #.recipe.all()
-        for shoplist in shoplists:
-            val = shoplist.recipe.annotate(amount=Sum('rec_ingrs__amount'))  #rec_ingrs.all() 
+        ingredients = Ingredient.objects.filter(
+            rec_ingrs__recipe__in=Recipe.objects.filter(
+                shoplists__user=request.user
+            )
+        ).annotate(sum_amount=Sum('rec_ingrs__amount'))
 
-        val = request.user.shoplists.recipe.rec_ingrs.all()
-            # val = 1 + 1            
-        # shoplists = request.user.shoplists.annotate(
-        #     recipe_count = Count()
-        # )
+        content = 'Ингредиент\tКол-во\tЕИ\n' + (
+            '\n'.join([f'{ingredient.name}\t'
+                       f'{ingredient.sum_amount}\t'
+                       f'{ingredient.measurement_unit}'
+                       for ingredient in ingredients]))
 
-        # recipe = shoplists.recipe.all()
-        val = 1 + 1
+        response = HttpResponse(
+            content,
+            content_type='text/plain',
+            headers={
+                "Content-Disposition":
+                'attachment; filename="Список покупок.txt"'
+            },
+        )
+
+        return response

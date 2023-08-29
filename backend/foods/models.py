@@ -1,8 +1,9 @@
-from core.constants import FIELD_LENGTH
 from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
+
+from core.constants import FIELD_LENGTH
 
 User = get_user_model()
 
