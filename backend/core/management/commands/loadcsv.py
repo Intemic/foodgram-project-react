@@ -102,19 +102,19 @@ def create_favorite_model(
 
 class Command(BaseCommand):
     help = 'Загрузка данных из CSV файлов'
-    link_models = (
-        ('ingredients.csv', Ingredient, create_simple_model),
-        # ('tags.csv', Tag, create_simple_model),
-        # ('recipe.csv', Recipe, create_recipe_model),
-        # ('recipetag.csv', RecipeTag, create_recipe_tag_model),
-        # (
-        #     'recipeingredient.csv',
-        #     RecipeIngredient,
-        #     create_recipe_ingredient_model
-        # ),
-        # ('follow.csv', Follow, create_follow_model),
-        # ('favorite.csv', Favorite, create_favorite_model),
-    )
+    # link_models = (
+    #     ('ingredients.csv', Ingredient, create_simple_model),
+    #     # ('tags.csv', Tag, create_simple_model),
+    #     # ('recipe.csv', Recipe, create_recipe_model),
+    #     # ('recipetag.csv', RecipeTag, create_recipe_tag_model),
+    #     # (
+    #     #     'recipeingredient.csv',
+    #     #     RecipeIngredient,
+    #     #     create_recipe_ingredient_model
+    #     # ),
+    #     # ('follow.csv', Follow, create_follow_model),
+    #     # ('favorite.csv', Favorite, create_favorite_model),
+    # )
 
     def handle(self, *args, **options):
         work_dir = Path(Path(settings.BASE_DIR).parent, 'data')

@@ -2,6 +2,7 @@ from core.pagination import PageLimitPagination
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Sum
 from rest_framework import filters, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -105,3 +106,23 @@ class RecipeViewSet(ModelViewSet):
 
         shoplist.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(
+        permission_classes=[permissions.IsAuthenticated],
+        detail=False,
+    )
+    def download_shopping_cart(self, request):
+        shoplists = request.user.shoplists.annotate(name=('recipe__rec_ingrs__name'), amount=Sum('recipe__rec_ingrs__amount')) #all()
+        # recipe_in = Recipe.objects.filter(shoplists__in=shoplists)
+        # shoplists__recipe.ingredients.all() #.recipe.all()
+        for shoplist in shoplists:
+            val = shoplist.recipe.annotate(amount=Sum('rec_ingrs__amount'))  #rec_ingrs.all() 
+
+        val = request.user.shoplists.recipe.rec_ingrs.all()
+            # val = 1 + 1            
+        # shoplists = request.user.shoplists.annotate(
+        #     recipe_count = Count()
+        # )
+
+        # recipe = shoplists.recipe.all()
+        val = 1 + 1
