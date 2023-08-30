@@ -1,14 +1,12 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, status
+from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from core.pagination import PageLimitPagination
-from core.views import CreateDestroyViewSet
 
 from .models import Follow, User
 from .serializers import (FollowCreateSerializer, FollowSerializer,
@@ -29,13 +27,13 @@ class UserViewSet(ModelViewSet):
         serializer = UserSerializers(request.user)
         return Response(serializer.data)
 
-    @action(
-        permission_classes=[IsAuthenticated],
-        detail=False,
-        methods=['post']
-    )
-    def set_password(self, request):
-        pass
+    # @action(
+    #     permission_classes=[IsAuthenticated],
+    #     detail=False,
+    #     methods=['post']
+    # )
+    # def set_password(self, request):
+    #     pass
 
     @action(
         detail=True,
@@ -52,7 +50,10 @@ class UserViewSet(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         try:
-            follow = Follow.objects.get(user=self.request.user.id, following=pk)
+            follow = Follow.objects.get(
+                user=self.request.user.id,
+                following=pk
+            )
         except ObjectDoesNotExist:
             return Response(
                 {"errors": 'Пользователь не подписан на данного автора'},
@@ -62,7 +63,7 @@ class UserViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
-        detail=False            
+        detail=False
     )
     def subscriptions(self, request):
         users = request.user.follower.all()
@@ -80,7 +81,7 @@ class UserViewSet(ModelViewSet):
         if self.request.method in ('POST',):
             return UserCreateSerializers
         return super().get_serializer_class()
-    
+
     def get_permissions(self):
         if self.action == 'list' or self.action == 'create':
             return (AllowAny(),)

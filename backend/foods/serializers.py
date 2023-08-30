@@ -9,7 +9,7 @@ from rest_framework.validators import UniqueTogetherValidator
 from core.constants import FIELD_LENGTH
 from users.serializers import UserSerializers
 
-from .models import (Favorite, Ingredient, Recipe, RecipeIngredient, RecipeTag,
+from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                      ShopList, Tag)
 
 User = get_user_model()
@@ -24,7 +24,7 @@ class TagSerializer(serializers.ModelSerializer):
             'color',
             'slug',
         )
-    
+
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -38,7 +38,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 class RecipeIngredientCreateSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
-    
+
     class Meta:
         model = RecipeIngredient
         fields = ('id', 'amount')
@@ -160,14 +160,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredients')
 
         recipe = Recipe.objects.create(**validated_data)
-        for ing in ingredients:
-            RecipeIngredient.objects.create(
-                recipe=recipe,
-                ingredient=Ingredient.objects.get(id=ing['id']),
-                amount=ing['amount']
-            )
 
-        recipe.tags.set(tags)    
+        self.save_tag_ingredient(recipe, tags, ingredients)
 
         return recipe
 
@@ -182,35 +176,43 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             'cooking_time',
             instance.cooking_time
         )
-        instance.save() 
+        instance.save()
 
+        self.save_tag_ingredient(instance, tags, ingredients)
+
+        return instance
+
+    def save_tag_ingredient(self, instance, tags, ingredients):
+        # удалим старые данные, актуально только для обновления, но для
+        # создания ничего страшного
         RecipeIngredient.objects.filter(recipe=instance.id).delete()
-        for ing in ingredients:
-            RecipeIngredient.objects.create(
+
+        RecipeIngredient.objects.bulk_create(
+            [RecipeIngredient(
                 recipe=instance,
                 ingredient=Ingredient.objects.get(id=ing['id']),
                 amount=ing['amount']
-            )
+            ) for ing in ingredients]
+        )
 
         instance.tags.set(tags)
-        return instance
-    
+
     def validate(self, attrs):
         tags = attrs.get('tags')
         if not tags:
             raise serializers.ValidationError(
                 'Укажите тэги для рецепта'
-            )    
+            )
         ingredients = attrs.get('ingredients')
         if not ingredients:
             raise serializers.ValidationError(
                 'Не указаны ингредиенты для рецепта'
-            )    
+            )
         # не должен же рецепт состоять только из одного ингредиента
         if len(ingredients) == 1:
             raise serializers.ValidationError(
                 'Укажите больше одного ингредиента'
-            )    
+            )
 
         return attrs
 
@@ -237,10 +239,10 @@ class FavoriteCreateSerializer(serializers.ModelSerializer):
         if attrs['user'].id == attrs['recipe'].author.id:
             raise serializers.ValidationError(
                 {'following': 'Недопустимо добавить свой рецепт в избранное'}
-            ) 
+            )
 
         return attrs
-    
+
     def to_representation(self, instance):
         return RecipeShortSerializer(instance.recipe).data
 
@@ -260,13 +262,5 @@ class ShopListCreateSerializer(serializers.ModelSerializer):
             )
         ]
 
-    # def validate(self, attrs):
-    #     if attrs['user'].id == attrs['recipe'].author.id:
-    #         raise serializers.ValidationError(
-    #             {'following': 'Недопустимо добавить свой рецепт в избранное'}
-    #         ) 
-
-    #     return attrs
-    
     def to_representation(self, instance):
         return RecipeShortSerializer(instance.recipe).data

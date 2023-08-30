@@ -33,8 +33,8 @@ class UserSerializers(serializers.ModelSerializer):
         req = self.context.get('request')
         if req:
             if (
-                req.user.is_authenticated and 
-                req.user.following.filter(user=obj.id).exists()
+                req.user.is_authenticated
+                and req.user.following.filter(user=obj.id).exists()
             ):
                 return True
         return False
@@ -82,7 +82,7 @@ class UserCreateSerializers(serializers.ModelSerializer):
             'last_name',
             'password',
         )
-    
+
     def create(self, validated_data):
         password = validated_data.pop('password')
         user = User.objects.create(**validated_data)
@@ -124,10 +124,10 @@ class FollowCreateSerializer(serializers.ModelSerializer):
         if attrs['user'].id == attrs['following'].id:
             raise serializers.ValidationError(
                 {'following': 'Подписка на себя недопустима'}
-            ) 
+            )
 
         return attrs
-    
+
     def to_representation(self, instance):
         return FollowSerializer(instance).data
 
@@ -147,7 +147,10 @@ class FollowSerializer(serializers.ModelSerializer):
         model = Follow
 
     def to_representation(self, instance):
-        recipes_limit = int(self.context.get('recipes_limit', 0))
+        try:
+            recipes_limit = int(self.context.get('recipes_limit', 0))
+        except TypeError:
+            recipes_limit = 0
         user_data = UserSerializers(instance.following).data
         if recipes_limit:
             recipes = instance.following.recipes.all()[:recipes_limit]

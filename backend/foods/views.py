@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from core.pagination import PageLimitPagination
+
 from .filters import IngredientFilter, RecipeFilter
 from .models import Favorite, Ingredient, Recipe, ShopList, Tag
 from .permissions import AuthorOrReadOnly
@@ -58,7 +59,6 @@ class RecipeViewSet(ModelViewSet):
         serializer.save(author=self.request.user)
 
     @action(
-        # permission_classes=[permissions.IsAuthenticated],
         detail=True,
         methods=['post', 'delete']
     )
@@ -86,7 +86,6 @@ class RecipeViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
-        # permission_classes=[permissions.IsAuthenticated],
         detail=True,
         methods=['post', 'delete']
     )
@@ -124,12 +123,12 @@ class RecipeViewSet(ModelViewSet):
             )
         ).annotate(sum_amount=Sum('rec_ingrs__amount'))
 
-        if len(ingredients) == 0:
+        if len(ingredients) != 0:
             content = 'Ингредиент\tКол-во\tЕИ\n' + (
                 '\n'.join([f'{ingredient.name}\t'
-                        f'{ingredient.sum_amount}\t'
-                        f'{ingredient.measurement_unit}'
-                        for ingredient in ingredients]))
+                           f'{ingredient.sum_amount}\t'
+                           f'{ingredient.measurement_unit}'
+                           for ingredient in ingredients]))
 
             response = HttpResponse(
                 content,
@@ -139,7 +138,7 @@ class RecipeViewSet(ModelViewSet):
                     'attachment; filename="Список покупок.txt"'
                 },
             )
-            
+
             return response
 
-        return HttpResponse(status=status.HTTP_404_NOT_FOUND)  
+        return HttpResponse(status=status.HTTP_200_OK)
