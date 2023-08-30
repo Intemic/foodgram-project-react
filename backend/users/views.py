@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
@@ -17,14 +17,12 @@ from .serializers import (FollowCreateSerializer, FollowSerializer,
 
 class UserViewSet(ModelViewSet):
     serializer_class = UserSerializers
-    permission_classes = (permissions.AllowAny,)
     queryset = User.objects.all()
     http_method_names = ['get', 'post', 'delete']
     pagination_class = PageLimitPagination
 
     @action(
         url_path='me',
-        permission_classes=[IsAuthenticated],
         detail=False,
     )
     def get_me(self, request):
@@ -40,7 +38,6 @@ class UserViewSet(ModelViewSet):
         pass
 
     @action(
-        permission_classes=[IsAuthenticated],
         detail=True,
         methods=['post', 'delete']
     )
@@ -65,7 +62,6 @@ class UserViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
-        permission_classes=[IsAuthenticated],
         detail=False            
     )
     def subscriptions(self, request):
@@ -84,3 +80,8 @@ class UserViewSet(ModelViewSet):
         if self.request.method in ('POST',):
             return UserCreateSerializers
         return super().get_serializer_class()
+    
+    def get_permissions(self):
+        if self.action == 'list' or self.action == 'create':
+            return (AllowAny(),)
+        return super().get_permissions()

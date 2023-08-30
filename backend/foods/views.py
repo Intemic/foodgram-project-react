@@ -11,6 +11,7 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from core.pagination import PageLimitPagination
 from .filters import IngredientFilter, RecipeFilter
 from .models import Favorite, Ingredient, Recipe, ShopList, Tag
+from .permissions import AuthorOrReadOnly
 from .serializers import (FavoriteCreateSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeSerializer,
                           ShopListCreateSerializer, TagSerializer)
@@ -32,7 +33,7 @@ class IngredientViewSet(ReadOnlyModelViewSet):
 
 class RecipeViewSet(ModelViewSet):
     queryset = Recipe.objects.all()
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (AuthorOrReadOnly,)
     serializer_class = RecipeSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
     filter_backends = (DjangoFilterBackend,)
@@ -57,7 +58,7 @@ class RecipeViewSet(ModelViewSet):
         serializer.save(author=self.request.user)
 
     @action(
-        permission_classes=[permissions.IsAuthenticated],
+        # permission_classes=[permissions.IsAuthenticated],
         detail=True,
         methods=['post', 'delete']
     )
@@ -85,7 +86,7 @@ class RecipeViewSet(ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
-        permission_classes=[permissions.IsAuthenticated],
+        # permission_classes=[permissions.IsAuthenticated],
         detail=True,
         methods=['post', 'delete']
     )
@@ -123,19 +124,22 @@ class RecipeViewSet(ModelViewSet):
             )
         ).annotate(sum_amount=Sum('rec_ingrs__amount'))
 
-        content = 'Ингредиент\tКол-во\tЕИ\n' + (
-            '\n'.join([f'{ingredient.name}\t'
-                       f'{ingredient.sum_amount}\t'
-                       f'{ingredient.measurement_unit}'
-                       for ingredient in ingredients]))
+        if len(ingredients) == 0:
+            content = 'Ингредиент\tКол-во\tЕИ\n' + (
+                '\n'.join([f'{ingredient.name}\t'
+                        f'{ingredient.sum_amount}\t'
+                        f'{ingredient.measurement_unit}'
+                        for ingredient in ingredients]))
 
-        response = HttpResponse(
-            content,
-            content_type='text/plain',
-            headers={
-                "Content-Disposition":
-                'attachment; filename="Список покупок.txt"'
-            },
-        )
+            response = HttpResponse(
+                content,
+                content_type='text/plain',
+                headers={
+                    "Content-Disposition":
+                    'attachment; filename="Список покупок.txt"'
+                },
+            )
+            
+            return response
 
-        return response
+        return HttpResponse(status=status.HTTP_404_NOT_FOUND)  

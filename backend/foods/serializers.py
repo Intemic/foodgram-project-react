@@ -24,7 +24,7 @@ class TagSerializer(serializers.ModelSerializer):
             'color',
             'slug',
         )
-
+    
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -184,8 +184,9 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         )
         instance.save() 
 
+        RecipeIngredient.objects.filter(recipe=instance.id).delete()
         for ing in ingredients:
-            RecipeIngredient.objects.get_or_create(
+            RecipeIngredient.objects.create(
                 recipe=instance,
                 ingredient=Ingredient.objects.get(id=ing['id']),
                 amount=ing['amount']
@@ -193,6 +194,25 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
         instance.tags.set(tags)
         return instance
+    
+    def validate(self, attrs):
+        tags = attrs.get('tags')
+        if not tags:
+            raise serializers.ValidationError(
+                'Укажите тэги для рецепта'
+            )    
+        ingredients = attrs.get('ingredients')
+        if not ingredients:
+            raise serializers.ValidationError(
+                'Не указаны ингредиенты для рецепта'
+            )    
+        # не должен же рецепт состоять только из одного ингредиента
+        if len(ingredients) == 1:
+            raise serializers.ValidationError(
+                'Укажите больше одного ингредиента'
+            )    
+
+        return attrs
 
     def to_representation(self, instance):
         return RecipeSerializer(instance).data
