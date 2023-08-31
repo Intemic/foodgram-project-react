@@ -63,10 +63,15 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'bd/db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB', 'django'),
+        'USER': os.getenv('POSTGRES_USER', 'django'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+        'HOST': os.getenv('DB_HOST', ''),
+        'PORT': os.getenv('DB_PORT', 5432)
     }
 }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -120,17 +125,12 @@ REST_FRAMEWORK = {
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'HIDE_USERS': False,
-    'PERMISSIONS': {
-        'user': ['rest_framework.permissions.AllowAny'],
-        # 'token_create': ['rest_framework.permissions.AllowAny'],
-        # 'password_reset': ['rest_framework.permissions.AllowAny'],
-        # 'token_destroy': ['rest_framework.permissions.IsAuthenticated'],
-    },
-    # 'SERIALIZERS': 
-    # {
-    #     'user': 'users.serializers.UserSerializers',
-    #     'user_create': 'users.serializers.UserCreateSerializers',
-    #     'current_user': 'users.serializers.UserSerializers',
+    # 'PERMISSIONS': {
+    #     'user': ['rest_framework.permissions.AllowAny'],
+    #     # 'token_create': ['rest_framework.permissions.AllowAny'],
+    #     # 'password_reset': ['rest_framework.permissions.AllowAny'],
+    #     # 'token_destroy': ['rest_framework.permissions.IsAuthenticated'],
     # },
+
 
 }

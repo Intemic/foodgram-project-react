@@ -94,7 +94,28 @@ def create_favorite_model(
             model(
                 id=row.get('id'),
                 user=User.objects.get(id=row.get('user_id')),
-                recipe=Recipe.objects.get(id=row.get('recipe_id')),
+                recipe=Recipe.objects.get(id=row.get('recipe_id')),                
+            )
+            for row in file_data
+        ]
+    )
+
+
+def create_user_model(
+        file_data: csv.DictReader, model: User):
+    model.objects.all().delete()
+    model.objects.bulk_create(
+        [
+            model(
+                id=row.get('id'),
+                is_superuser=row.get('is_superuser'),
+                is_staff=row.get('is_staff'),
+                is_active=row.get('is_active'),
+                username=row.get('username'),
+                password=row.get('password'),
+                email=row.get('email'),
+                first_name=row.get('first_name'),
+                last_name=row.get('last_name')         
             )
             for row in file_data
         ]
@@ -104,6 +125,7 @@ def create_favorite_model(
 class Command(BaseCommand):
     help = 'Загрузка данных из CSV файлов'
     link_models = (
+        ('users.csv', User, create_user_model),
         ('ingredients.csv', Ingredient, create_simple_model),
         ('tags.csv', Tag, create_simple_model),
         ('recipe.csv', Recipe, create_recipe_model),

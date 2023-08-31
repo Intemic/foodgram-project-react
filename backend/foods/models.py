@@ -24,8 +24,13 @@ class Name(models.Model):
         return self.name[:50]
 
 
-class Ingredient(Name):
+class Ingredient(models.Model):
     """Ингридиенты."""
+    name = models.CharField(
+        verbose_name='Название',
+        max_length=FIELD_LENGTH['NAME'],
+        help_text='Название',
+    )
     measurement_unit = models.CharField(
         verbose_name='ЕИ',
         max_length=FIELD_LENGTH['UNITS'],
@@ -36,6 +41,9 @@ class Ingredient(Name):
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
         ordering = ['name']
+
+    def __str__(self) -> str:
+        return self.name[:50]
 
 
 class Tag(Name):
