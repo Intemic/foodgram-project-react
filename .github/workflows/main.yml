@@ -18,8 +18,10 @@ jobs:
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
+#        local: "infra/docker-compose.production.yml"
         source: "infra/docker-compose.production.yml"
-        target: "foodgram/docker-compose.production.yml"
+        target: "foodgram"
+        strip_components: 1
     # - name: Copy nginx.conf via ssh
     #   uses: appleboy/scp-action@master
     #   with:
