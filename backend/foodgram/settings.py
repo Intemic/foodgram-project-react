@@ -123,12 +123,4 @@ REST_FRAMEWORK = {
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'HIDE_USERS': False,
-    # 'PERMISSIONS': {
-    #     'user': ['rest_framework.permissions.AllowAny'],
-    #     # 'token_create': ['rest_framework.permissions.AllowAny'],
-    #     # 'password_reset': ['rest_framework.permissions.AllowAny'],
-    #     # 'token_destroy': ['rest_framework.permissions.IsAuthenticated'],
-    # },
-
-
 }
