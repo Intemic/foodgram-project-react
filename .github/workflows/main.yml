@@ -18,7 +18,6 @@ jobs:
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
-#        local: "infra/docker-compose.production.yml"
         source: "infra/docker-compose.production.yml"
         target: "foodgram"
         strip_components: 1
@@ -56,6 +55,19 @@ jobs:
           sudo docker compose -f docker-compose.production.yml up -d
           sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
           sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --no-input
+
+    - name: Expand test data
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USER }}
+        key: ${{ secrets.SSH_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
+        script: |
+          cd foodgram
+          sudo docker compose cp ../data backend:/data
+          sudo docker compose cp ../data/recipes/. backend:/app/media/recipes
+          sudo docker compose -f docker-compose.production.yml exec backend python manage.py loadcsv
 
   send_message:
     runs-on: ubuntu-latest
