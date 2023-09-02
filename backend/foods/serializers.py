@@ -2,15 +2,13 @@ import base64
 
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
-from django.utils.module_loading import import_string
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from core.constants import FIELD_LENGTH
 from users.serializers import UserSerializers
-
-from .models import (Favorite, Ingredient, Recipe, RecipeIngredient,
-                     ShopList, Tag)
+from .models import (Favorite, Ingredient, Recipe, RecipeIngredient, ShopList,
+                     Tag)
 
 User = get_user_model()
 

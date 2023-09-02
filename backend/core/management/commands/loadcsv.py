@@ -94,7 +94,7 @@ def create_favorite_model(
             model(
                 id=row.get('id'),
                 user=User.objects.get(id=row.get('user_id')),
-                recipe=Recipe.objects.get(id=row.get('recipe_id')),                
+                recipe=Recipe.objects.get(id=row.get('recipe_id')),
             )
             for row in file_data
         ]
@@ -115,7 +115,7 @@ def create_user_model(
                 password=row.get('password'),
                 email=row.get('email'),
                 first_name=row.get('first_name'),
-                last_name=row.get('last_name')         
+                last_name=row.get('last_name')
             )
             for row in file_data
         ]
