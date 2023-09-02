@@ -39,7 +39,7 @@ jobs:
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        source: "/data/*"
+        source: "data/*"
         target: "foodgram/data"      
 
     - name: Executing remote ssh commands to deploy
