@@ -61,7 +61,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-if DEBUG == True:
+if DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
@@ -133,5 +133,5 @@ DJOSER = {
     'HIDE_USERS': False,
     'SERIALIZERS': {'user': 'users.serializers.UserSerializers',
                     'user_create': 'users.serializers.UserCreateSerializers',
-                    },    
+                    },
 }
