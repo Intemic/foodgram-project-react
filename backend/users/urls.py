@@ -8,9 +8,9 @@ router_v1 = DefaultRouter()
 router_v1.register('users', UserViewSet, basename='users')
 
 urlpatterns = [
-    path('', include('djoser.urls')),
     path(
-        'users/reset_password/',
-        DjoserViewSet.as_view({'post': 'reset_password'})
+        'users/set_password/',
+        DjoserViewSet.as_view({'post': 'set_password'})
     ),
+    path('', include(router_v1.urls)),
 ]

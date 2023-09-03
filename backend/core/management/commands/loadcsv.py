@@ -127,7 +127,7 @@ class Command(BaseCommand):
     link_models = (
         ('users.csv', User, create_user_model),
         ('ingredients.csv', Ingredient, create_simple_model),
-        ('tags.csv', Tag, create_simple_model),
+        ('tag.csv', Tag, create_simple_model),
         ('recipe.csv', Recipe, create_recipe_model),
         ('recipetag.csv', RecipeTag, create_recipe_tag_model),
         (
