@@ -27,14 +27,6 @@ class UserViewSet(ModelViewSet):
         serializer = UserSerializers(request.user)
         return Response(serializer.data)
 
-    # @action(
-    #     permission_classes=[IsAuthenticated],
-    #     detail=False,
-    #     methods=['post']
-    # )
-    # def set_password(self, request):
-    #     pass
-
     @action(
         detail=True,
         methods=['post', 'delete']

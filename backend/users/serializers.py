@@ -34,7 +34,7 @@ class UserSerializers(serializers.ModelSerializer):
         if req:
             if (
                 req.user.is_authenticated
-                and req.user.following.filter(user=obj.id).exists()
+                and req.user.follower.filter(following=obj.id).exists()
             ):
                 return True
         return False
