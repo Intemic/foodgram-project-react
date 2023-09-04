@@ -2,7 +2,7 @@ import re
 
 from django.core.exceptions import ValidationError
 
-from core.constants import USERNAME_PATTERN
+from core.constants import NAME_PATTERN, USERNAME_PATTERN
 
 
 def username_validator(value):
@@ -14,5 +14,16 @@ def username_validator(value):
     if value.lower() == 'me':
         raise ValidationError(
             'Использовать имя me запрещено'
+        )
+    return value
+
+
+def name_validator(value):
+    result = set(re.sub(NAME_PATTERN, '', value))
+    if result:
+        raise ValidationError(
+            ('Имя не может начинаться с цифры или пробела и '
+             'быть меньше трех символов'
+             )
         )
     return value

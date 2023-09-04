@@ -15,10 +15,6 @@ class User(AbstractUser):
         db_index=True,
         validators=[username_validator]
     )
-    # password = models.CharField(
-    #     verbose_name='Пароль',
-    #     max_length=FIELD_LENGTH['PASSWORD']
-    # )
     email = models.CharField(
         verbose_name='Email',
         max_length=FIELD_LENGTH['EMAIL'],

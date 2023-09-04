@@ -6,8 +6,9 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from core.constants import FIELD_LENGTH
-from foods.models import (Favorite, Ingredient, Recipe, RecipeIngredient, ShopList,
-                     Tag)
+from core.validators import name_validator
+from foods.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
+                          ShopList, Tag)
 from .serializers_users import UserSerializers
 
 User = get_user_model()
@@ -133,7 +134,8 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     )
     image = Base64ImageField()
     name = serializers.CharField(
-        max_length=FIELD_LENGTH['NAME']
+        max_length=FIELD_LENGTH['NAME'],
+        validators=[name_validator]
     )
 
     class Meta:
@@ -186,12 +188,22 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         # создания ничего страшного
         RecipeIngredient.objects.filter(recipe=instance.id).delete()
 
+        # соберем дубликаты
+        total_quantity = {}
+        for ingredient in ingredients:
+            if not ingredient.get('id') in total_quantity:
+                total_quantity[
+                    ingredient.get('id')] = int(ingredient['amount'])
+            else:
+                total_quantity[
+                    ingredient.get('id')] += int(ingredient['amount'])
+
         RecipeIngredient.objects.bulk_create(
             [RecipeIngredient(
                 recipe=instance,
-                ingredient=Ingredient.objects.get(id=ing['id']),
-                amount=ing['amount']
-            ) for ing in ingredients]
+                ingredient=Ingredient.objects.get(id=key),
+                amount=int(amount)
+            ) for key, amount in total_quantity.items()]
         )
 
         instance.tags.set(tags)

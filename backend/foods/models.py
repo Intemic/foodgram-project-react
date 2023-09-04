@@ -14,7 +14,7 @@ class Name(models.Model):
         verbose_name='Название',
         max_length=FIELD_LENGTH['NAME'],
         help_text='Название',
-        unique=True
+        unique=True,
     )
 
     class Meta:

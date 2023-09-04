@@ -13,8 +13,8 @@ from foods.models import Favorite, Ingredient, Recipe, ShopList, Tag
 from .pagination import PageLimitPagination
 from .permissions import AuthorOrReadOnly
 from .serializers_foods import (FavoriteCreateSerializer, IngredientSerializer,
-                          RecipeCreateSerializer, RecipeSerializer,
-                          ShopListCreateSerializer, TagSerializer)
+                                RecipeCreateSerializer, RecipeSerializer,
+                                ShopListCreateSerializer, TagSerializer)
 
 
 class TagViewSet(ReadOnlyModelViewSet):
