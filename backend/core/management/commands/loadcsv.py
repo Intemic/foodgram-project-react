@@ -28,7 +28,7 @@ def create_recipe_model(file_data: csv.DictReader, model: Recipe):
     model.objects.bulk_create(
         [
             model(
-                id=row.get('id'),
+                # id=row.get('id'),
                 name=row.get('name'),
                 author=User.objects.get(id=row.get('author_id')),
                 pub_date=row.get('pub_date'),
