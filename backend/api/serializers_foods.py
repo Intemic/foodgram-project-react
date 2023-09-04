@@ -24,6 +24,13 @@ class TagSerializer(serializers.ModelSerializer):
             'slug',
         )
 
+    def validate(self, value):
+        if Tag.objects.filter(name=value).exists():
+            raise serializers.ValidationError(
+                'Тэг с таким именем уже существует!'
+            )
+        return value
+
 
 class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -153,6 +160,13 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         if value < 1:
             raise serializers.ValidationError(
                 'Введите значение больше или равно 1 мин!'
+            )
+        return value
+
+    def validate_name(self, value):
+        if Recipe.objects.filter(name=value).exists():
+            raise serializers.ValidationError(
+                'Рецепт с таким именем уже существует!'
             )
         return value
 
