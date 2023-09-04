@@ -9,7 +9,6 @@ from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 from core.constants import FIELD_LENGTH
 from core.validators import username_validator
 from foods.models import Recipe
-
 from users.models import Follow, User
 
 

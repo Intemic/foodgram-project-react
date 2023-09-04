@@ -10,11 +10,11 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from .filters import IngredientFilter, RecipeFilter
 from foods.models import Favorite, Ingredient, Recipe, ShopList, Tag
+from .pagination import PageLimitPagination
 from .permissions import AuthorOrReadOnly
 from .serializers_foods import (FavoriteCreateSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeSerializer,
                           ShopListCreateSerializer, TagSerializer)
-from .pagination import PageLimitPagination
 
 
 class TagViewSet(ReadOnlyModelViewSet):
