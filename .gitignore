@@ -133,3 +133,5 @@ dmypy.json
 media/
 /backend/.vscode/
 /backend/backend_static
+/backend/bd
+docker-compose.yml

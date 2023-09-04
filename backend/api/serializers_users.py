@@ -10,7 +10,7 @@ from core.constants import FIELD_LENGTH
 from core.validators import username_validator
 from foods.models import Recipe
 
-from .models import Follow, User
+from users.models import Follow, User
 
 
 class UserSerializers(serializers.ModelSerializer):

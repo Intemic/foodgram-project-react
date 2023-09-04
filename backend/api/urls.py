@@ -1,7 +1,22 @@
 from django.urls import include, path
+from rest_framework.routers import DefaultRouter
+from djoser.views import UserViewSet as DjoserViewSet
+
+from .views_foods import IngredientViewSet, RecipeViewSet, TagViewSet
+from .views_users import UserViewSet
+
+router_v1 = DefaultRouter()
+router_v1.register('tags', TagViewSet, basename='tags')
+router_v1.register('ingredients', IngredientViewSet, basename='ingredients')
+router_v1.register('recipes', RecipeViewSet, basename='recipes')
+router_v1.register('tags', TagViewSet, basename='tags')
+router_v1.register('users', UserViewSet, basename='users')
 
 urlpatterns = [
-    path('', include('foods.urls')),
-    path('', include('users.urls')),
-    path('auth/', include('djoser.urls.authtoken'))
+    path(
+        'users/set_password/',
+        DjoserViewSet.as_view({'post': 'set_password'})
+    ),
+    path('', include(router_v1.urls)),
+    path('auth/', include('djoser.urls.authtoken')),
 ]

@@ -9,12 +9,12 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from .filters import IngredientFilter, RecipeFilter
-from .models import Favorite, Ingredient, Recipe, ShopList, Tag
+from foods.models import Favorite, Ingredient, Recipe, ShopList, Tag
 from .permissions import AuthorOrReadOnly
-from .serializers import (FavoriteCreateSerializer, IngredientSerializer,
+from .serializers_foods import (FavoriteCreateSerializer, IngredientSerializer,
                           RecipeCreateSerializer, RecipeSerializer,
                           ShopListCreateSerializer, TagSerializer)
-from core.pagination import PageLimitPagination
+from .pagination import PageLimitPagination
 
 
 class TagViewSet(ReadOnlyModelViewSet):

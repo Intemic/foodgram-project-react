@@ -6,8 +6,8 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
 from core.constants import FIELD_LENGTH
-from users.serializers import UserSerializers
-from .models import (Favorite, Ingredient, Recipe, RecipeIngredient, ShopList,
+from .serializers_users import UserSerializers
+from foods.models import (Favorite, Ingredient, Recipe, RecipeIngredient, ShopList,
                      Tag)
 
 User = get_user_model()
