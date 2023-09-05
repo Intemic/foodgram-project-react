@@ -19,8 +19,8 @@ services:
     volumes:
       - static:/backend_static
       - media:/app/media
-      - ../backend/bd:/app/bd
-      - ../backend:/app
+      # - ../backend/bd:/app/bd
+      # - ../backend:/app
     depends_on:
       - db
   frontend:
