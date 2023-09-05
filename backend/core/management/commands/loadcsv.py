@@ -28,7 +28,6 @@ def create_recipe_model(file_data: csv.DictReader, model: Recipe):
     model.objects.bulk_create(
         [
             model(
-                # id=row.get('id'),
                 name=row.get('name'),
                 author=User.objects.get(id=row.get('author_id')),
                 pub_date=row.get('pub_date'),
@@ -46,7 +45,6 @@ def create_recipe_tag_model(file_data: csv.DictReader, model: RecipeTag):
     model.objects.bulk_create(
         [
             model(
-                id=row.get('id'),
                 recipe=Recipe.objects.get(id=row.get('recipe_id')),
                 tag=Tag.objects.get(id=row.get('tag_id'))
             )
@@ -61,7 +59,6 @@ def create_recipe_ingredient_model(
     model.objects.bulk_create(
         [
             model(
-                id=row.get('id'),
                 recipe=Recipe.objects.get(id=row.get('recipe_id')),
                 ingredient=Ingredient.objects.get(id=row.get('ingredient_id')),
                 amount=row.get('amount')
@@ -77,7 +74,6 @@ def create_follow_model(
     model.objects.bulk_create(
         [
             model(
-                id=row.get('id'),
                 user=User.objects.get(id=row.get('user_id')),
                 following=User.objects.get(id=row.get('following_id')),
             )
@@ -92,7 +88,6 @@ def create_favorite_model(
     model.objects.bulk_create(
         [
             model(
-                id=row.get('id'),
                 user=User.objects.get(id=row.get('user_id')),
                 recipe=Recipe.objects.get(id=row.get('recipe_id')),
             )
@@ -107,7 +102,6 @@ def create_user_model(
     model.objects.bulk_create(
         [
             model(
-                id=row.get('id'),
                 is_superuser=row.get('is_superuser'),
                 is_staff=row.get('is_staff'),
                 is_active=row.get('is_active'),
