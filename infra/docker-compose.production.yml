@@ -42,4 +42,3 @@ services:
       - static_volume:/usr/share/nginx/html/
       - ../docs/:/usr/share/nginx/html/api/docs/
       - media_volume:/usr/share/nginx/html/media/      
-
