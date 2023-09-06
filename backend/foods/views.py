@@ -8,11 +8,11 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from .filters import IngredientFilter, RecipeFilter
+from core.pagination import PageLimitPagination
 from foods.models import Favorite, Ingredient, Recipe, ShopList, Tag
-from .pagination import PageLimitPagination
+from .filters import IngredientFilter, RecipeFilter
 from .permissions import AuthorOrReadOnly
-from .serializers_foods import (FavoriteCreateSerializer, IngredientSerializer,
+from .serializers import (FavoriteCreateSerializer, IngredientSerializer,
                                 RecipeCreateSerializer, RecipeSerializer,
                                 ShopListCreateSerializer, TagSerializer)
 

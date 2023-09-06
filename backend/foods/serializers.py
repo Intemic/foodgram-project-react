@@ -9,7 +9,7 @@ from core.constants import FIELD_LENGTH
 from core.validators import name_validator
 from foods.models import (Favorite, Ingredient, Recipe, RecipeIngredient,
                           ShopList, Tag)
-from .serializers_users import UserSerializers
+from users.serializers import UserSerializers
 
 User = get_user_model()
 

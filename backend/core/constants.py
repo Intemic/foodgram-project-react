@@ -12,3 +12,5 @@ FIELD_LENGTH = {
 USERNAME_PATTERN = r'^[\w.@+-]+'
 # будем считать что название должн состоять как минимум из 3 букв
 NAME_PATTERN = r'^[^\s\d]{1}\w{2,}'
+
+PAGE_SIZE = 6

@@ -6,6 +6,7 @@ from foods.models import Ingredient, Recipe
 
 
 class IngredientFilter(SearchFilter):
+    """Фильтр для ингредиентов."""
     search_param = 'name'
 
     class Meta:
@@ -14,12 +15,13 @@ class IngredientFilter(SearchFilter):
 
 
 class RecipeFilter(django_filters.FilterSet):
+    """Фильтрация для рецептов."""
     is_favorited = filter.BooleanFilter(method='get_is_favorited')
     author = filter.NumberFilter(field_name='author')
     is_in_shopping_cart = filter.BooleanFilter(
         method='get_is_in_shopping_cart'
     )
-    tags = tags = filter.AllValuesMultipleFilter(field_name='tags__slug')
+    tags = filter.AllValuesMultipleFilter(field_name='tags__slug')
 
     class Meta:
         model = Recipe
@@ -31,11 +33,11 @@ class RecipeFilter(django_filters.FilterSet):
         )
 
     def get_is_favorited(self, queryset, name, value):
-        if self.request.user.is_authenticated and value:
+        if self.request.user.is_authenticated:
             return queryset.filter(favorites__user=self.request.user)
         return queryset
 
     def get_is_in_shopping_cart(self, queryset, name, value):
-        if self.request.user.is_authenticated and value:
+        if self.request.user.is_authenticated:
             return queryset.filter(shoplists__user=self.request.user)
         return queryset
