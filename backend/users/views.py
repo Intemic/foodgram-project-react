@@ -7,9 +7,9 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from core.pagination import PageLimitPagination
-from users.models import Follow, User
+from .models import Follow, User
 from .serializers import (FollowCreateSerializer, FollowSerializer,
-                                UserCreateSerializers, UserSerializers)
+                          UserCreateSerializers, UserSerializers)
 
 
 class UserViewSet(ModelViewSet):

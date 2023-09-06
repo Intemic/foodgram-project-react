@@ -1,5 +1,4 @@
 from django.contrib.auth.models import AbstractUser
-from django.core.validators import validate_email
 from django.db import models
 from django.db.models import UniqueConstraint
 
@@ -8,6 +7,7 @@ from core.validators import username_validator
 
 
 class User(AbstractUser):
+    """Пользователь подходящий под ТЗ."""
     username = models.CharField(
         verbose_name='Имя пользователя',
         max_length=FIELD_LENGTH['USER_NAME'],
@@ -15,11 +15,9 @@ class User(AbstractUser):
         db_index=True,
         validators=[username_validator]
     )
-    email = models.CharField(
+    email = models.EmailField(
         verbose_name='Email',
-        max_length=FIELD_LENGTH['EMAIL'],
         unique=True,
-        validators=[validate_email]
     )
     first_name = models.CharField(
         verbose_name='Имя',
@@ -29,6 +27,9 @@ class User(AbstractUser):
         verbose_name='Фамилия',
         max_length=FIELD_LENGTH['LAST_NAME']
     )
+    password = models.CharField(
+        max_length=FIELD_LENGTH['PASSWORD']
+    )
 
     class Meta:
         verbose_name = 'Пользователь'
@@ -36,7 +37,7 @@ class User(AbstractUser):
         ordering = ('username',)
 
     def __str__(self) -> str:
-        return self.get_full_name()[:50]
+        return self.get_full_name()[:FIELD_LENGTH['LENGTH_OUTPUT_NAME']]
 
 
 class Follow(models.Model):
@@ -63,3 +64,4 @@ class Follow(models.Model):
         ]
         verbose_name = 'Подписки'
         verbose_name_plural = 'Подписки'
+        ordering = ('user',)

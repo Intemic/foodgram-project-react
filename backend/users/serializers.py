@@ -39,8 +39,7 @@ class UserSerializers(serializers.ModelSerializer):
 
 
 class UserCreateSerializers(serializers.ModelSerializer):
-    email = serializers.CharField(
-        max_length=FIELD_LENGTH['EMAIL'],
+    email = serializers.EmailField(
         validators=[
             validate_email,
             UniqueValidator(

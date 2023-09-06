@@ -1,5 +1,6 @@
+from colorfield.fields import ColorField
 from django.contrib.auth import get_user_model
-from django.core.validators import MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
 
@@ -8,7 +9,7 @@ from core.constants import FIELD_LENGTH
 User = get_user_model()
 
 
-class Name(models.Model):
+class BaseName(models.Model):
     """Базовый класс, наименование."""
     name = models.CharField(
         verbose_name='Название',
@@ -20,9 +21,10 @@ class Name(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ('name',)
 
     def __str__(self) -> str:
-        return self.name[:50]
+        return self.name[:FIELD_LENGTH['LENGTH_OUTPUT_NAME']]
 
 
 class Ingredient(models.Model):
@@ -38,31 +40,31 @@ class Ingredient(models.Model):
         help_text='Единицы измерения'
     )
 
-    class Meta(Name.Meta):
+    class Meta(BaseName.Meta):
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
-        ordering = ['name']
+        ordering = ('name',)
 
     def __str__(self) -> str:
-        return self.name[:50]
+        return self.name[:FIELD_LENGTH['LENGTH_OUTPUT_NAME']]
 
 
-class Tag(Name):
+class Tag(BaseName):
     """Тэг."""
-    color = models.CharField(
-        max_length=7,
+    color = ColorField(
+        max_length=FIELD_LENGTH['COLOR'],
     )
     slug = models.SlugField(
         max_length=FIELD_LENGTH['SLUG'],
         unique=True
     )
 
-    class Meta(Name.Meta):
+    class Meta(BaseName.Meta):
         verbose_name = 'Тэг'
         verbose_name_plural = 'Тэги'
 
 
-class Recipe(Name):
+class Recipe(BaseName):
     """Рецепт."""
     author = models.ForeignKey(
         User,
@@ -91,6 +93,10 @@ class Recipe(Name):
             MinValueValidator(
                 1,
                 'Введите значение больше или равно 1 мин'
+            ),
+            MaxValueValidator(
+                32000,
+                'Что то долговато готовить'
             )
         ],
     )
@@ -107,10 +113,10 @@ class Recipe(Name):
         through='RecipeTag'
     )
 
-    class Meta(Name.Meta):
+    class Meta(BaseName.Meta):
         verbose_name = 'Рецепт'
         verbose_name_plural = 'Рецепты'
-        ordering = ['-pub_date', 'name']
+        ordering = ('-pub_date', 'name',)
 
 
 class RecipeTag(models.Model):
@@ -134,6 +140,7 @@ class RecipeTag(models.Model):
         ]
         verbose_name = 'Рецепт, Тэг'
         verbose_name_plural = 'Рецепт, Тэги'
+        ordering = ('recipe',)
 
 
 class RecipeIngredient(models.Model):
@@ -151,7 +158,7 @@ class RecipeIngredient(models.Model):
         on_delete=models.CASCADE,
         related_name='rec_ingrs'
     )
-    amount = models.PositiveIntegerField(
+    amount = models.PositiveSmallIntegerField(
         verbose_name='Количество',
         help_text='Количество в рецепте',
         validators=[
@@ -172,6 +179,7 @@ class RecipeIngredient(models.Model):
         ]
         verbose_name = 'Рецепт, Ингредиент'
         verbose_name_plural = 'Рецепт, Ингредиенты'
+        ordering = ('recipe',)
 
 
 class Favorite(models.Model):
@@ -195,6 +203,7 @@ class Favorite(models.Model):
         ]
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
+        ordering = ('user', 'recipe',)
 
 
 class ShopList(models.Model):
@@ -218,4 +227,4 @@ class ShopList(models.Model):
         ]
         verbose_name = 'Список покупок'
         verbose_name_plural = 'Списоки покупок'
-        ordering = ['user', 'recipe']
+        ordering = ('user', 'recipe',)

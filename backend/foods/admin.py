@@ -6,14 +6,17 @@ from .models import Favorite, Ingredient, Recipe, ShopList, Tag
 
 class TagsInline(admin.TabularInline):
     model = Recipe.tags.through
+    min_num = 1
 
 
 class IngredientsInline(admin.TabularInline):
     model = Recipe.ingredients.through
+    min_num = 1
 
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
+    """'Админка' для тэга."""
     list_display = ('id', 'name', 'color', 'slug',)
     list_filter = ('name', )
     empty_value_display = '-пусто-'
@@ -21,6 +24,7 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Ingredient)
 class Ingredient(admin.ModelAdmin):
+    """'Админка' для ингредиента."""
     list_display = ('id', 'name', 'measurement_unit',)
     list_filter = ('name', )
     search_fields = ('name',)
@@ -29,6 +33,7 @@ class Ingredient(admin.ModelAdmin):
 
 @admin.register(Favorite)
 class Favorite(admin.ModelAdmin):
+    """'Админка' для фаворитов."""
     list_display = ('id', 'user', 'recipe', )
     list_filter = ('user', )
     empty_value_display = '-пусто-'
@@ -36,6 +41,7 @@ class Favorite(admin.ModelAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
+    """'Админка' для рецепта."""
     inlines = [
         TagsInline,
         IngredientsInline,
@@ -83,6 +89,7 @@ class RecipeAdmin(admin.ModelAdmin):
 
 @admin.register(ShopList)
 class ShopList(admin.ModelAdmin):
+    """'Админка' для списка покупок."""
     list_display = ('id', 'user', 'recipe', )
     list_filter = ('user', )
     empty_value_display = '-пусто-'

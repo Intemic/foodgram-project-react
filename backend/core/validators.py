@@ -6,6 +6,7 @@ from core.constants import NAME_PATTERN, USERNAME_PATTERN
 
 
 def username_validator(value):
+    """Валидация имени пользователя."""
     result = set(re.sub(USERNAME_PATTERN, '', value))
     if result:
         raise ValidationError(
@@ -19,6 +20,8 @@ def username_validator(value):
 
 
 def name_validator(value):
+    """Валидация названия, в требованиях не было,
+    но что мешает проверить?."""
     result = set(re.sub(NAME_PATTERN, '', value))
     if result:
         raise ValidationError(
