@@ -59,7 +59,6 @@ class RecipeAdmin(admin.ModelAdmin):
             'image',
             'get_html_photo'
         ),
-        ('get_count',),
     )
     list_display = (
         'id',

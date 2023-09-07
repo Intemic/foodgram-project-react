@@ -16,7 +16,6 @@ class BaseName(models.Model):
         max_length=FIELD_LENGTH['NAME'],
         help_text='Название',
         db_index=True,
-        unique=True
     )
 
     class Meta:
@@ -27,13 +26,8 @@ class BaseName(models.Model):
         return self.name[:FIELD_LENGTH['LENGTH_OUTPUT_NAME']]
 
 
-class Ingredient(models.Model):
+class Ingredient(BaseName):
     """Ингридиенты."""
-    name = models.CharField(
-        verbose_name='Название',
-        max_length=FIELD_LENGTH['NAME'],
-        help_text='Название',
-    )
     measurement_unit = models.CharField(
         verbose_name='ЕИ',
         max_length=FIELD_LENGTH['UNITS'],
@@ -41,12 +35,13 @@ class Ingredient(models.Model):
     )
 
     class Meta(BaseName.Meta):
+        constraints = [
+            UniqueConstraint(
+                fields=['name', 'measurement_unit'], name='name unit'
+            )
+        ]
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
-        ordering = ('name',)
-
-    def __str__(self) -> str:
-        return self.name[:FIELD_LENGTH['LENGTH_OUTPUT_NAME']]
 
 
 class Tag(BaseName):

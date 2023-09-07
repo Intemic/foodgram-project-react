@@ -33,11 +33,14 @@ class RecipeFilter(django_filters.FilterSet):
         )
 
     def get_is_favorited(self, queryset, name, value):
+        # проверку (and value:) убрал но странно что при переданом параметре
+        # со значением 0 все равно показываем только из списка фаворитов
         if self.request.user.is_authenticated:
             return queryset.filter(favorites__user=self.request.user)
         return queryset
 
     def get_is_in_shopping_cart(self, queryset, name, value):
+        # здесь аналогичный вопрос (and value:)
         if self.request.user.is_authenticated:
             return queryset.filter(shoplists__user=self.request.user)
         return queryset

@@ -1,4 +1,3 @@
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -10,6 +9,7 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from core.pagination import PageLimitPagination
 from foods.models import Favorite, Ingredient, Recipe, ShopList, Tag
+
 from .filters import IngredientFilter, RecipeFilter
 from .permissions import AuthorOrReadOnly
 from .serializers import (FavoriteCreateSerializer, IngredientSerializer,
@@ -45,12 +45,6 @@ class RecipeViewSet(ModelViewSet):
             return RecipeCreateSerializer
         return super().get_serializer_class()
 
-    def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
-    def perform_update(self, serializer):
-        serializer.save(author=self.request.user)
-
     @action(
         detail=True,
         methods=['post', 'delete']
@@ -65,18 +59,18 @@ class RecipeViewSet(ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        try:
-            favorite = Favorite.objects.get(
-                user=self.request.user.id,
-                recipe=pk
-            )
-        except ObjectDoesNotExist:
-            return Response(
-                {"errors": 'Рецепт отсутствует в избранном'},
-                status=status.HTTP_400_BAD_REQUEST)
+        cnt, obj = Favorite.objects.filter(
+            user=self.request.user.id,
+            recipe=pk
+        ).delete()
 
-        favorite.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if cnt:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(
+            {"errors": 'Рецепт отсутствует в избранном'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     @action(
         detail=True,
@@ -92,18 +86,18 @@ class RecipeViewSet(ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        try:
-            shoplist = ShopList.objects.get(
-                user=self.request.user.id,
-                recipe=pk
-            )
-        except ObjectDoesNotExist:
-            return Response(
-                {"errors": 'Рецепт отсутствует в списке покупок'},
-                status=status.HTTP_400_BAD_REQUEST)
+        cnt, obj = ShopList.objects.filter(
+            user=self.request.user.id,
+            recipe=pk
+        ).delete()
 
-        shoplist.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if cnt:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+
+        return Response(
+            {"errors": 'Рецепт отсутствует в списке покупок'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     @action(
         permission_classes=[permissions.IsAuthenticated],
@@ -116,30 +110,15 @@ class RecipeViewSet(ModelViewSet):
             )
         ).annotate(sum_amount=Sum('rec_ingrs__amount'))
 
-        content = 'Ингредиент\tКол-во\tЕИ\n' + (
-            '\n'.join([f'{ingredient.name}\t'
-                        f'{ingredient.sum_amount}\t'
-                        f'{ingredient.measurement_unit}'
-                        for ingredient in ingredients]))
-
-        response = HttpResponse(
-            content,
-            content_type='text/plain',
-            headers={
-                "Content-Disposition":
-                'attachment; filename="Список покупок.txt"'
-            },
-        )
-
         return RecipeViewSet.fill_data_file(ingredients)
-    
+
     @staticmethod
     def fill_data_file(ingredients):
         content = 'Ингредиент\tКол-во\tЕИ\n' + (
             '\n'.join([f'{ingredient.name}\t'
-                        f'{ingredient.sum_amount}\t'
-                        f'{ingredient.measurement_unit}'
-                        for ingredient in ingredients]))
+                       f'{ingredient.sum_amount}\t'
+                       f'{ingredient.measurement_unit}'
+                       for ingredient in ingredients]))
 
         return HttpResponse(
             content,
@@ -148,5 +127,4 @@ class RecipeViewSet(ModelViewSet):
                 "Content-Disposition":
                 'attachment; filename="Список покупок.txt"'
             },
-        )        
-
+        )

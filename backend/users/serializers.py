@@ -28,14 +28,11 @@ class UserSerializers(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        req = self.context.get('request')
-        if req:
-            if (
-                req.user.is_authenticated
-                and req.user.follower.filter(following=obj.id).exists()
-            ):
-                return True
-        return False
+        return (self.context
+                and self.context['request'].user.is_authenticated
+                and obj.following.filter(
+                    user=self.context['request'].user.id).exists()
+                )
 
 
 class UserCreateSerializers(serializers.ModelSerializer):
@@ -126,42 +123,38 @@ class FollowCreateSerializer(serializers.ModelSerializer):
         return attrs
 
     def to_representation(self, instance):
-        return FollowSerializer(instance).data
+        return FollowSerializer(
+            instance.following,
+        ).data
 
 
-class FollowSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'is_subscribed',
+class FollowSerializer(UserSerializers):
+    recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
+
+    class Meta(UserSerializers.Meta):
+        fields = UserSerializers.Meta.fields + (
             'recipes',
             'recipes_count'
         )
-        model = Follow
 
-    def to_representation(self, instance):
-        try:
-            recipes_limit = int(self.context['request'].query_params.get('recipes_limit', 0))
-        except ValueError:
-            recipes_limit = 0
-        user_data = UserSerializers(instance.following).data
+    def get_recipes(self, obj):
+        recipes_limit = 0
+        if self.context.get('request'):
+            recipes_limit = int(
+                self.context['request'].query_params.get('recipes_limit', 0)
+            )
         if recipes_limit:
-            recipes = instance.following.recipes.all()[:recipes_limit]
+            recipes = obj.recipes.all()[:recipes_limit]
         else:
-            recipes = instance.following.recipes.all()
-        recipe_data = RecipeShortSerializer(
+            recipes = obj.recipes.all()
+        return RecipeShortSerializer(
             recipes,
             many=True
         ).data
-        return {
-            **user_data,
-            'recipes': recipe_data,
-            'recipes_count': instance.following.recipes.count()
-        }
+
+    def get_recipes_count(self, obj):
+        return obj.recipes.count()
 
 
 class RecipeShortSerializer(serializers.ModelSerializer):

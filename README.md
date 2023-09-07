@@ -64,6 +64,62 @@ python3 manage.py runserver
 http://127.0.0.1:8000/api/doc/
 ```
 
+### Запуск проекта в контейнере:
+
+Перейти в директорию:
+
+```
+ cd foodgram
+```
+
+Скачать последние обзазы с Docker Hub :
+
+```
+sudo docker compose -f docker-compose.production.yml pull
+```
+
+Удалить старые образы:
+
+```
+sudo docker compose -f docker-compose.production.yml down 
+```
+
+Удалить старые образы:
+
+```
+sudo docker compose -f docker-compose.production.yml down 
+```
+
+Запустить контейнеры:
+
+```
+sudo docker compose -f docker-compose.production.yml up -d
+```
+
+Выполнить миграции:
+
+```
+ sudo docker compose -f docker-compose.production.yml exec backend python manage.py migrate
+```
+
+Собрать статику:
+
+```
+sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --no-input
+```
+
+Скопировать статику
+
+```
+sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/backend_static/. /backend_static/static/ 
+```
+
+### Загрузить тестовые данные:
+
+```
+python3 manage.py loaddata ../data/db.json
+```
+
 ### Для реализации использовались следующие технологии:
 
 ```

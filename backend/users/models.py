@@ -15,6 +15,7 @@ class User(AbstractUser):
         db_index=True,
         validators=[username_validator]
     )
+    # это же обязательное поле, если убрать так понимаю станет необязательным?
     email = models.EmailField(
         verbose_name='Email',
         unique=True,
