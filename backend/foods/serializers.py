@@ -86,6 +86,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     author = UserSerializers()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
+    # без source не отображаются картинки на сервере
     image = serializers.ReadOnlyField(source='image.url')
 
     class Meta:
@@ -155,6 +156,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
         max_length=FIELD_LENGTH['NAME'],
         validators=[name_validator]
     )
+    
+    cooking_time = serializers.IntegerField(
+        min_value=FIELD_LENGTH['MIN_COOK_TIME'],
+        max_value=FIELD_LENGTH['MAX_COOK_TIME']
+    )
 
     class Meta:
         model = Recipe
@@ -167,12 +173,12 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             'cooking_time',
         )
 
-    def validate_cooking_time(self, value):
-        if value < 1:
-            raise serializers.ValidationError(
-                'Введите значение больше или равно 1 мин!'
-            )
-        return value
+    # def validate_cooking_time(self, value):
+    #     if value < 1:
+    #         raise serializers.ValidationError(
+    #             'Введите значение больше или равно 1 мин!'
+    #         )
+    #     return value
 
     def validate_name(self, value):
         if Recipe.objects.filter(name=value).exists():
@@ -233,6 +239,21 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 'Не указаны ингредиенты для рецепта'
             )
+        
+        count_ingredients = len( ingredients )
+        ing_no_dubl = {ingredient['ingredient'].id for ingredient in ingredients}
+        if len( ing_no_dubl ) != count_ingredients:
+            raise serializers.ValidationError(
+                'Присутствуют не уникальные ингредиенты для рецепта'
+            )            
+        
+        count_tags = len( tags )
+        tag_no_dubl = {tag.id for tag in tags}
+        if len( tag_no_dubl ) != count_tags:
+            raise serializers.ValidationError(
+                'Присутствуют не уникальные тэги для рецепта'
+            )            
+
         return attrs
 
     def to_representation(self, instance):

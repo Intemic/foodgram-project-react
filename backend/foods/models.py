@@ -91,11 +91,11 @@ class Recipe(BaseName):
         help_text='Время приготовления (в минутах)',
         validators=[
             MinValueValidator(
-                1,
+                FIELD_LENGTH['MIN_COOK_TIME'],
                 'Введите значение больше или равно 1 мин'
             ),
             MaxValueValidator(
-                32000,
+                FIELD_LENGTH['MAX_COOK_TIME'],
                 'Что то долговато готовить'
             )
         ],

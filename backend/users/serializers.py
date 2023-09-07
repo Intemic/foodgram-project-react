@@ -145,8 +145,8 @@ class FollowSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         try:
-            recipes_limit = int(self.context.get('recipes_limit', 0))
-        except TypeError:
+            recipes_limit = int(self.context['request'].query_params.get('recipes_limit', 0))
+        except ValueError:
             recipes_limit = 0
         user_data = UserSerializers(instance.following).data
         if recipes_limit:

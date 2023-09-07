@@ -8,6 +8,8 @@ FIELD_LENGTH = {
     'LAST_NAME': 150,
     'LENGTH_OUTPUT_NAME': 50,
     'COLOR': 7,
+    'MIN_COOK_TIME': 1,
+    'MAX_COOK_TIME': 32000,
 }
 
 USERNAME_PATTERN = r'^[\w.@+-]+'

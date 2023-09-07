@@ -4,7 +4,9 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
+# from rest_framework.viewsets import ModelViewSet
+from djoser.views import UserViewSet as DjoserViewSet
+
 
 from core.pagination import PageLimitPagination
 from .models import Follow, User
@@ -12,19 +14,19 @@ from .serializers import (FollowCreateSerializer, FollowSerializer,
                           UserCreateSerializers, UserSerializers)
 
 
-class UserViewSet(ModelViewSet):
+class UserViewSet(DjoserViewSet):  #(ModelViewSet): 
     serializer_class = UserSerializers
     queryset = User.objects.all()
     http_method_names = ['get', 'post', 'delete']
     pagination_class = PageLimitPagination
 
-    @action(
-        url_path='me',
-        detail=False,
-    )
-    def get_me(self, request):
-        serializer = UserSerializers(request.user)
-        return Response(serializer.data)
+    # @action(
+    #     url_path='me',
+    #     detail=False,
+    # )
+    # def get_me(self, request):
+    #     serializer = UserSerializers(request.user)
+    #     return Response(serializer.data)
 
     @action(
         detail=True,
@@ -63,7 +65,7 @@ class UserViewSet(ModelViewSet):
             page,
             many=True,
             context={
-                'recipes_limit': self.request.query_params.get('recipes_limit')
+                'request': self.request
             }
         )
         return self.get_paginated_response(serializer.data)
@@ -77,3 +79,5 @@ class UserViewSet(ModelViewSet):
         if self.action == 'list' or self.action == 'create':
             return (AllowAny(),)
         return super().get_permissions()
+
+    

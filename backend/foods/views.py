@@ -38,12 +38,6 @@ class RecipeViewSet(ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    filterset_fields = (
-        'is_favorited',
-        'author',
-        'is_in_shopping_cart',
-        'tags',
-    )
     pagination_class = PageLimitPagination
 
     def get_serializer_class(self):
@@ -122,22 +116,37 @@ class RecipeViewSet(ModelViewSet):
             )
         ).annotate(sum_amount=Sum('rec_ingrs__amount'))
 
-        if len(ingredients) != 0:
-            content = 'Ингредиент\tКол-во\tЕИ\n' + (
-                '\n'.join([f'{ingredient.name}\t'
-                           f'{ingredient.sum_amount}\t'
-                           f'{ingredient.measurement_unit}'
-                           for ingredient in ingredients]))
+        content = 'Ингредиент\tКол-во\tЕИ\n' + (
+            '\n'.join([f'{ingredient.name}\t'
+                        f'{ingredient.sum_amount}\t'
+                        f'{ingredient.measurement_unit}'
+                        for ingredient in ingredients]))
 
-            response = HttpResponse(
-                content,
-                content_type='text/plain',
-                headers={
-                    "Content-Disposition":
-                    'attachment; filename="Список покупок.txt"'
-                },
-            )
+        response = HttpResponse(
+            content,
+            content_type='text/plain',
+            headers={
+                "Content-Disposition":
+                'attachment; filename="Список покупок.txt"'
+            },
+        )
 
-            return response
+        return RecipeViewSet.fill_data_file(ingredients)
+    
+    @staticmethod
+    def fill_data_file(ingredients):
+        content = 'Ингредиент\tКол-во\tЕИ\n' + (
+            '\n'.join([f'{ingredient.name}\t'
+                        f'{ingredient.sum_amount}\t'
+                        f'{ingredient.measurement_unit}'
+                        for ingredient in ingredients]))
 
-        return HttpResponse(status=status.HTTP_200_OK)
+        return HttpResponse(
+            content,
+            content_type='text/plain',
+            headers={
+                "Content-Disposition":
+                'attachment; filename="Список покупок.txt"'
+            },
+        )        
+
