@@ -72,7 +72,7 @@ http://127.0.0.1:8000/api/doc/
  cd foodgram
 ```
 
-Скачать последние обзазы с Docker Hub :
+Скачать последние образы с Docker Hub :
 
 ```
 sudo docker compose -f docker-compose.production.yml pull
@@ -116,9 +116,18 @@ sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/bac
 
 ### Загрузить тестовые данные:
 
+из JSON
+
 ```
-python3 manage.py loaddata ../data/db.json
+python manage.py loaddata ../data/db.json
 ```
+
+из CSV
+
+```
+python manage.py loadcsv ../data
+```
+
 
 ### Для реализации использовались следующие технологии:
 

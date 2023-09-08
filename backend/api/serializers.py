@@ -8,8 +8,8 @@ from rest_framework.validators import UniqueTogetherValidator
 from core.constants import FIELD_LENGTH
 from users.serializers import UserSerializers
 
-from .models import (Favorite, Ingredient, Recipe, RecipeIngredient, ShopList,
-                     Tag)
+from foods.models import (Favorite, Ingredient, Recipe, RecipeIngredient, ShopList,
+                          Tag)
 
 User = get_user_model()
 
@@ -111,16 +111,20 @@ class RecipeSerializer(serializers.ModelSerializer):
             'cooking_time',
         )
 
+    def is_authenticated(self):
+        return bool(
+            self.context
+            and self.context.get('request').user.is_authenticated
+        )
+
     def get_is_favorited(self, obj):
-        return (self.context
-                and self.context['request'].user.is_authenticated
+        return bool( self.is_authenticated()
                 and obj.favorites.filter(
                     user=self.context['request'].user.id).exists()
                 )
 
     def get_is_in_shopping_cart(self, obj):
-        return (self.context
-                and self.context['request'].user.is_authenticated
+        return bool( self.is_authenticated()
                 and obj.shoplists.filter(
                     user=self.context['request'].user.id).exists()
                 )
