@@ -28,13 +28,13 @@ class UserSerializers(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        # в чем преимущество явного указания bool? 
-        # результат все равно же будет логическим выражением?  
+        # в чем преимущество явного указания bool?
+        # результат все равно же будет логическим выражением?
         return bool(self.context
-                and self.context.get('request').user.is_authenticated
-                and obj.following.filter(
-                    user=self.context.get('request').user.id).exists()
-                )
+                    and self.context.get('request').user.is_authenticated
+                    and obj.following.filter(
+                        user=self.context.get('request').user.id).exists()
+                    )
 
 
 class UserCreateSerializers(serializers.ModelSerializer):
@@ -98,7 +98,7 @@ class UserCreateSerializers(serializers.ModelSerializer):
     def to_representation(self, instance):
         serializer_data = UserSerializers(instance).data
         # согласно доке, в ответе при создании пользователя
-        # это поле отсутствует 
+        # это поле отсутствует
         serializer_data.pop('is_subscribed')
         return serializer_data
 
@@ -129,7 +129,7 @@ class FollowCreateSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         return FollowSerializer(
             instance.following,
-            context=self.context 
+            context=self.context
         ).data
 
 

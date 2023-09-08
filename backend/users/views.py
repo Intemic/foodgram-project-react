@@ -6,7 +6,6 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from core.pagination import PageLimitPagination
-
 from .models import Follow, User
 from .serializers import (FollowCreateSerializer, FollowSerializer,
                           UserCreateSerializers, UserSerializers)
