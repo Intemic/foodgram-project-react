@@ -28,8 +28,6 @@ class UserSerializers(serializers.ModelSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        # в чем преимущество явного указания bool?
-        # результат все равно же будет логическим выражением?
         return bool(self.context
                     and self.context.get('request').user.is_authenticated
                     and obj.following.filter(

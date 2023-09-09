@@ -12,7 +12,7 @@
 
 проект построен на архитектуре REST API
 
-Адрес сайта: https://yfoodgram.hopto.org/
+Адрес сайта: yfoodgram.hopto.org
 
 ### Как запустить проект:
 

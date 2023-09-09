@@ -33,16 +33,11 @@ class RecipeFilter(django_filters.FilterSet):
         )
 
     def get_is_favorited(self, queryset, name, value):
-        # Да, не внимательно посмотрел про value, но если убрать первую
-        # проверку то тогда же падает с 500 ошибкой, если пользователь
-        # не авторизован? согласно док рецепты могут смотреть и
-        #  не авторизованные пользователи
-        if self.request.user.is_authenticated and value:
-            return queryset.filter(favorites__user=self.request.user)
+        if value:
+            return queryset.filter(favorites__user_id=self.request.user.pk)
         return queryset
 
     def get_is_in_shopping_cart(self, queryset, name, value):
-        # аналогично
-        if self.request.user.is_authenticated and value:
-            return queryset.filter(shoplists__user=self.request.user)
+        if value:
+            return queryset.filter(shoplists__user_id=self.request.user.pk)
         return queryset

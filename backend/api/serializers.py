@@ -92,7 +92,6 @@ class RecipeSerializer(serializers.ModelSerializer):
     author = UserSerializers()
     is_favorited = serializers.SerializerMethodField()
     is_in_shopping_cart = serializers.SerializerMethodField()
-    # без source не отображаются картинки на сервере
     image = serializers.ReadOnlyField(source='image.url')
 
     class Meta:
