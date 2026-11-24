@@ -143,10 +143,19 @@ class FollowSerializer(UserSerializers):
 
     def get_recipes(self, obj):
         recipes_limit = 0
-        if self.context.get('request'):
-            recipes_limit = int(
-                self.context['request'].query_params.get('recipes_limit', 0)
-            )
+        request = self.context.get('request')
+        if request:
+            value = request.query_params.get('recipes_limit', 0)
+            try:
+                recipes_limit = int(value)
+            except (TypeError, ValueError):
+                raise serializers.ValidationError({
+                    'recipes_limit': 'Должно быть целым числом'
+                })
+            if recipes_limit < 0:
+                raise serializers.ValidationError({
+                    'recipes_limit': 'Не может быть отрицательным'
+                })
         if recipes_limit:
             recipes = obj.recipes.all()[:recipes_limit]
         else:

@@ -60,8 +60,12 @@ class Follow(models.Model):
         constraints = [
             UniqueConstraint(
                 fields=['user', 'following'],
-                name='unique following'
-            )
+                name='unique_following'
+            ),
+            models.CheckConstraint(
+                check=~models.Q(user=models.F('following')),
+                name='prevent_self_follow'
+            ),
         ]
         verbose_name = 'Подписки'
         verbose_name_plural = 'Подписки'

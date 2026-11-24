@@ -58,6 +58,10 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name='follow',
-            constraint=models.UniqueConstraint(fields=('user', 'following'), name='unique following'),
+            constraint=models.UniqueConstraint(fields=('user', 'following'), name='unique_following'),
+        ),
+        migrations.AddConstraint(
+            model_name='follow',
+            constraint=models.CheckConstraint(check=~models.Q(user=models.F('following')), name='prevent_self_follow'),
         ),
     ]
